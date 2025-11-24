@@ -1,0 +1,83 @@
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
+
+const ImageModal = ({ isOpen, imageSrc, caption, onClose }) => {
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={onClose}
+                    style={styles.overlay}
+                >
+                    <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
+                        onClick={(e) => e.stopPropagation()}
+                        style={styles.content}
+                    >
+                        <button onClick={onClose} style={styles.closeButton}>
+                            <X size={24} />
+                        </button>
+                        <img src={imageSrc} alt={caption || "Full screen view"} style={styles.image} />
+                        {caption && <div style={styles.caption}>{caption}</div>}
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+};
+
+const styles = {
+    overlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+        padding: '2rem',
+    },
+    content: {
+        position: 'relative',
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    image: {
+        maxWidth: '100%',
+        maxHeight: '80vh',
+        objectFit: 'contain',
+        borderRadius: '8px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+    },
+    closeButton: {
+        position: 'absolute',
+        top: '-40px',
+        right: 0,
+        background: 'none',
+        border: 'none',
+        color: '#fff',
+        cursor: 'pointer',
+        padding: '0.5rem',
+    },
+    caption: {
+        marginTop: '1rem',
+        color: '#fff',
+        fontSize: '1.1rem',
+        textAlign: 'center',
+        fontFamily: 'Playfair Display, serif',
+    }
+};
+
+export default ImageModal;
