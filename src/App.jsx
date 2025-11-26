@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Hero from './components/Hero';
@@ -16,6 +14,8 @@ import { AudioProvider } from './components/AudioController';
 import CustomCursor from './components/CustomCursor';
 import PageTransition from './components/PageTransition';
 import Login from './components/Login';
+import NavigationDock from './components/NavigationDock';
+import BackgroundParticles from './components/BackgroundParticles';
 
 const PASSWORD = "Shunnani@2025"; // Simple client-side password
 
@@ -43,6 +43,7 @@ function App() {
     return (
       <AudioProvider>
         <CustomCursor />
+        <BackgroundParticles />
         <Login onLogin={handleLogin} />
       </AudioProvider>
     );
@@ -51,7 +52,9 @@ function App() {
   return (
     <AudioProvider>
       <CustomCursor />
+      <BackgroundParticles />
       <ScrollToTop />
+      <NavigationDock />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
@@ -103,20 +106,21 @@ const Home = () => {
 const styles = {
   membersSection: {
     padding: '5rem 0',
-    backgroundColor: '#0a0a0a', // Dark bg
+    // Removed background color to let particles show through
   },
 
   footer: {
-    backgroundColor: '#000', // Pure black
+    backgroundColor: 'rgba(0,0,0,0.8)', // Semi-transparent
     color: '#fff',
     textAlign: 'center',
     padding: '3rem 2rem',
     marginTop: 'auto',
-    borderTop: '1px solid #222',
+    borderTop: '1px solid rgba(255,255,255,0.1)',
+    backdropFilter: 'blur(10px)',
   },
   footerNote: {
     fontSize: '0.8rem',
-    color: '#555',
+    color: '#888',
     marginTop: '0.5rem',
     letterSpacing: '1px',
   }

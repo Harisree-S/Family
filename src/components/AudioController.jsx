@@ -26,6 +26,31 @@ export const AudioProvider = ({ children }) => {
         }
     }, [isVideoPlaying, currentTrack]);
 
+    // Handle visibility change (minimize/tab switch)
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                if (!bgAudioRef.current.paused) {
+                    bgAudioRef.current.pause();
+                    sessionStorage.setItem('was_bg_playing', 'true');
+                } else {
+                    sessionStorage.setItem('was_bg_playing', 'false');
+                }
+            } else {
+                // Resume only if it was playing before and video is NOT playing
+                const wasPlaying = sessionStorage.getItem('was_bg_playing') === 'true';
+                if (wasPlaying && !isVideoPlaying && currentTrack) {
+                    bgAudioRef.current.play().catch(e => console.log("Resume failed:", e));
+                }
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [isVideoPlaying, currentTrack]);
+
     const playImageAudio = useCallback((src, volume = 0.5, loop = true) => {
         if (!src) return;
 

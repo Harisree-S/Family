@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowLeft, Play, Image as ImageIcon } from 'lucide-react';
 import { memories } from '../data/memoryData';
 import ImageModal from './ImageModal';
@@ -29,16 +29,18 @@ const containerVariants = {
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.1
+            staggerChildren: 0.1,
+            delayChildren: 0.3
         }
     }
 };
 
 const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 30, opacity: 0 },
     visible: {
         y: 0,
-        opacity: 1
+        opacity: 1,
+        transition: { type: "spring", stiffness: 50 }
     }
 };
 
@@ -64,7 +66,7 @@ const MemoryDetails = () => {
     });
 
     const memory = memories.find(m => m.id === parseInt(id));
-    const { playImageAudio, playSfx, clearImageAudio, setOverrideBgTrack, setIsVideoPlaying } = useAudio();
+    const { playImageAudio, playSfx, clearImageAudio, setIsVideoPlaying } = useAudio();
 
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
@@ -73,6 +75,11 @@ const MemoryDetails = () => {
     const [uploadFile, setUploadFile] = useState(null);
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
+
+    // Parallax Header
+    const { scrollY } = useScroll();
+    const yHeader = useTransform(scrollY, [0, 500], [0, 200]);
+    const opacityHeader = useTransform(scrollY, [0, 400], [1, 0.3]);
 
     const fetchMedia = () => {
         if (memory) {
@@ -86,7 +93,6 @@ const MemoryDetails = () => {
         setHiddenMedia(getHiddenStaticMedia());
         setCaptionOverrides(getStaticCaptionOverrides());
 
-        // Fetch cover override
         if (memory) {
             getCoverOverride(memory.id, 'memory').then(cover => {
                 if (cover) {
@@ -155,7 +161,7 @@ const MemoryDetails = () => {
             } else {
                 await saveMedia(memory.id, 'memory', uploadFileType, uploadFile, caption, scale, position);
                 showToast('Uploaded successfully!', 'success');
-                fetchMedia(); // Refresh list
+                fetchMedia();
             }
         } catch (error) {
             console.error(error);
@@ -212,7 +218,6 @@ const MemoryDetails = () => {
 
     const handleSaveCaption = async (newCaption) => {
         if (!editingItem) return;
-
         try {
             if (editingItem.id) {
                 await updateMedia(editingItem.id, { caption: newCaption });
@@ -298,52 +303,57 @@ const MemoryDetails = () => {
 
                 <div className="container">
                     <Link to="/" style={styles.backLink}>
-                        <ArrowLeft size={24} /> Back to Gallery
+                        <ArrowLeft size={24} /> <span style={{ marginLeft: '0.5rem' }}>Back to Gallery</span>
                     </Link>
 
                     <div style={styles.header}>
+                        {/* Immersive Cover Section */}
                         <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ delay: 0.2 }}
-                            style={styles.coverImageContainer}
+                            style={{ ...styles.coverSection, y: yHeader, opacity: opacityHeader }}
                         >
-                            <img
-                                src={coverImage || memory.cover}
-                                alt={memory.title}
-                                style={{
-                                    ...styles.coverImage,
-                                    ...coverStyle
-                                }}
-                            />
-                            <button
-                                onClick={() => handleUploadClick('cover')}
-                                style={styles.editCoverBtn}
-                                title="Change Cover Photo"
-                            >
-                                <ImageIcon size={16} />
-                            </button>
+                            <div style={styles.coverImageWrapper}>
+                                <img
+                                    src={coverImage || memory.cover}
+                                    alt={memory.title}
+                                    style={{
+                                        ...styles.coverImage,
+                                        ...coverStyle
+                                    }}
+                                />
+                                <div style={styles.coverOverlay} />
+                                <button
+                                    onClick={() => handleUploadClick('cover')}
+                                    style={styles.editCoverBtn}
+                                    title="Change Cover Photo"
+                                >
+                                    <ImageIcon size={16} />
+                                </button>
+                            </div>
                         </motion.div>
+
+                        {/* Glass Info Card */}
                         <motion.div
-                            initial={{ x: 50, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                            style={styles.info}
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.2, duration: 0.8 }}
+                            style={styles.infoCard}
+                            className="glass-panel"
                         >
                             <h1 style={styles.title}>{memory.title}</h1>
+                            <div style={styles.divider} />
                             <p style={styles.description}>{memory.description}</p>
 
-                            <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <div style={styles.actionButtons}>
                                 <button
                                     onClick={() => handleUploadClick('image')}
-                                    style={{ ...styles.uploadBtn, opacity: isUploadingPhoto ? 0.5 : 1, cursor: isUploadingPhoto ? 'not-allowed' : 'pointer' }}
+                                    style={styles.actionBtn}
                                     disabled={isUploadingPhoto || isUploadingVideo}
                                 >
                                     <ImageIcon size={18} /> {isUploadingPhoto ? 'Uploading...' : 'Add Photo'}
                                 </button>
                                 <button
                                     onClick={() => handleUploadClick('video')}
-                                    style={{ ...styles.uploadBtn, opacity: isUploadingVideo ? 0.5 : 1, cursor: isUploadingVideo ? 'not-allowed' : 'pointer' }}
+                                    style={styles.actionBtn}
                                     disabled={isUploadingPhoto || isUploadingVideo}
                                 >
                                     <Play size={18} /> {isUploadingVideo ? 'Uploading...' : 'Add Video'}
@@ -352,17 +362,21 @@ const MemoryDetails = () => {
                         </motion.div>
                     </div>
 
+                    {/* Photos Section */}
                     <motion.div
-                        initial={{ y: 50, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
                         style={styles.section}
                     >
-                        <h2 style={styles.sectionTitle}><ImageIcon style={{ marginRight: '10px' }} /> Photos</h2>
+                        <h2 style={styles.sectionTitle}>
+                            <span style={styles.titleIcon}><ImageIcon size={24} /></span>
+                            Captured Moments
+                        </h2>
                         <motion.div
                             variants={containerVariants}
                             initial="hidden"
-                            animate="visible"
+                            whileInView="visible"
                             viewport={{ once: true }}
                             style={styles.grid}
                         >
@@ -377,22 +391,26 @@ const MemoryDetails = () => {
                                     />
                                 </motion.div>
                             )) : (
-                                <p style={{ color: '#666', fontStyle: 'italic' }}>No photos yet.</p>
+                                <p style={styles.emptyText}>No photos yet.</p>
                             )}
                         </motion.div>
                     </motion.div>
 
+                    {/* Videos Section */}
                     <motion.div
-                        initial={{ y: 50, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.3 }}
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
                         style={styles.section}
                     >
-                        <h2 style={styles.sectionTitle}><Play style={{ marginRight: '10px' }} /> Videos</h2>
+                        <h2 style={styles.sectionTitle}>
+                            <span style={styles.titleIcon}><Play size={24} /></span>
+                            Video Memories
+                        </h2>
                         <motion.div
                             variants={containerVariants}
                             initial="hidden"
-                            animate="visible"
+                            whileInView="visible"
                             viewport={{ once: true }}
                             style={styles.grid}
                         >
@@ -407,7 +425,7 @@ const MemoryDetails = () => {
                                     />
                                 </motion.div>
                             )) : (
-                                <p style={{ color: '#666', fontStyle: 'italic' }}>No videos yet.</p>
+                                <p style={styles.emptyText}>No videos yet.</p>
                             )}
                         </motion.div>
                     </motion.div>
@@ -420,40 +438,65 @@ const MemoryDetails = () => {
 const styles = {
     page: {
         minHeight: '100vh',
-        backgroundColor: '#050505',
+        backgroundColor: '#030305',
         color: '#fff',
         padding: '2rem 0',
+        backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a 0%, #030305 70%)',
     },
     backLink: {
         display: 'inline-flex',
         alignItems: 'center',
         color: '#d4af37',
         textDecoration: 'none',
-        marginBottom: '2rem',
-        fontSize: '1.1rem',
-        gap: '0.5rem',
+        marginBottom: '3rem',
+        fontSize: '1rem',
+        textTransform: 'uppercase',
+        letterSpacing: '0.1em',
+        opacity: 0.8,
+        transition: 'opacity 0.3s',
     },
     header: {
-        textAlign: 'center',
-        marginBottom: '4rem',
-    },
-    coverImageContainer: {
-        width: '100%',
-        height: 'clamp(250px, 40vh, 400px)',
-        overflow: 'hidden',
-        borderRadius: '15px',
-        marginBottom: '2rem',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '3rem',
+        marginBottom: '6rem',
         position: 'relative',
+    },
+    coverSection: {
+        position: 'relative',
+        zIndex: 1,
+        width: '100%',
+        maxWidth: '1200px',
+    },
+    coverImageWrapper: {
+        width: '100%',
+        height: 'clamp(300px, 50vh, 500px)',
+        borderRadius: '30px',
+        overflow: 'hidden',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+        position: 'relative',
+    },
+    coverImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        filter: 'contrast(1.1) saturate(1.1)',
+    },
+    coverOverlay: {
+        position: 'absolute',
+        inset: 0,
+        background: 'linear-gradient(to bottom, transparent 0%, rgba(3,3,5,0.5) 100%)',
+        pointerEvents: 'none',
     },
     editCoverBtn: {
         position: 'absolute',
-        bottom: '15px',
-        right: '15px',
-        width: '36px',
-        height: '36px',
+        bottom: '20px',
+        right: '20px',
+        width: '40px',
+        height: '40px',
         borderRadius: '50%',
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: 'rgba(0,0,0,0.8)',
         border: '1px solid #d4af37',
         color: '#d4af37',
         display: 'flex',
@@ -461,57 +504,89 @@ const styles = {
         justifyContent: 'center',
         cursor: 'pointer',
         zIndex: 10,
+        transition: 'transform 0.2s',
     },
-    coverImage: {
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-    },
-    info: {
+    infoCard: {
+        maxWidth: '900px',
+        width: '90%',
+        padding: '3rem',
+        borderRadius: '30px',
         textAlign: 'center',
+        marginTop: '-100px', // Overlap effect
+        zIndex: 2,
     },
     title: {
-        fontSize: 'clamp(2rem, 5vw, 3rem)',
-        color: '#d4af37',
+        fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+        fontFamily: "'Cormorant Garamond', serif",
+        color: '#fff',
         marginBottom: '1rem',
-        fontFamily: 'Playfair Display, serif',
+        textShadow: '0 0 30px rgba(255,255,255,0.1)',
+    },
+    divider: {
+        width: '80px',
+        height: '1px',
+        background: 'linear-gradient(90deg, transparent, #d4af37, transparent)',
+        margin: '0 auto 2rem',
     },
     description: {
         fontSize: '1.2rem',
+        lineHeight: '1.8',
         color: '#ccc',
+        fontFamily: "'Outfit', sans-serif",
+        fontWeight: 300,
+        marginBottom: '2.5rem',
         maxWidth: '800px',
-        margin: '0 auto',
-        marginTop: '1rem',
+        margin: '0 auto 2.5rem',
     },
-    section: {
-        marginBottom: '4rem',
+    actionButtons: {
+        display: 'flex',
+        gap: '1.5rem',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
     },
-    sectionTitle: {
-        fontSize: '2rem',
-        borderBottom: '1px solid #333',
-        paddingBottom: '1rem',
-        marginBottom: '2rem',
+    actionBtn: {
         display: 'flex',
         alignItems: 'center',
-        color: '#fff',
-    },
-    grid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-        gap: '2rem',
-    },
-    uploadBtn: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        padding: '0.5rem 1rem',
+        gap: '0.8rem',
+        padding: '0.8rem 2rem',
         backgroundColor: 'rgba(212, 175, 55, 0.1)',
-        border: '1px solid #d4af37',
-        borderRadius: '20px',
+        border: '1px solid rgba(212, 175, 55, 0.3)',
+        borderRadius: '50px',
         color: '#d4af37',
         cursor: 'pointer',
         fontSize: '0.9rem',
+        textTransform: 'uppercase',
+        letterSpacing: '0.1em',
         transition: 'all 0.3s ease',
+    },
+    section: {
+        marginBottom: '6rem',
+    },
+    sectionTitle: {
+        fontSize: '2.5rem',
+        fontFamily: "'Cormorant Garamond', serif",
+        marginBottom: '3rem',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '1rem',
+    },
+    titleIcon: {
+        color: '#d4af37',
+        display: 'flex',
+    },
+    grid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+        gap: '2rem',
+    },
+    emptyText: {
+        color: '#666',
+        fontStyle: 'italic',
+        textAlign: 'center',
+        gridColumn: '1 / -1',
+        padding: '2rem',
     }
 };
 
