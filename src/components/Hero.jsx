@@ -130,6 +130,8 @@ const Hero = () => {
                             src={heroBg}
                             alt="Family"
                             style={styles.mainImage}
+                            fetchPriority="high"
+                            loading="eager"
                         />
                         <div style={styles.imageGlow} />
                         <div style={styles.reflection} />
@@ -223,7 +225,7 @@ function getStyles(isMobile) {
             margin: '0 auto',
             zIndex: 10,
             position: 'relative',
-            padding: isMobile ? '2rem 1rem' : '4rem 2rem',
+            padding: isMobile ? '2rem 1rem 8rem 1rem' : '4rem 2rem', // Added bottom padding to clear dock
             justifyContent: 'center',
             alignItems: 'center',
         },
@@ -240,7 +242,7 @@ function getStyles(isMobile) {
             width: '100%',
             height: '100%',
             maxWidth: isMobile ? '100%' : '1100px',
-            maxHeight: isMobile ? '45vh' : '65vh', // Reduced height on mobile
+            maxHeight: isMobile ? '40vh' : '65vh', // Slightly reduced mobile height to give more room for text
             borderRadius: '20px',
             boxShadow: '0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.1)',
             transformStyle: 'preserve-3d',
@@ -274,10 +276,10 @@ function getStyles(isMobile) {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            marginTop: isMobile ? '2rem' : '3rem',
-            marginBottom: isMobile ? '2rem' : '2rem',
+            marginTop: isMobile ? '1.5rem' : '0rem', // Removed PC margin to move text further up
+            marginBottom: isMobile ? '0' : '2rem',
             zIndex: 20,
-            padding: isMobile ? '0 1rem' : '0', // Add padding on mobile
+            padding: isMobile ? '0 1rem' : '0',
         },
         subtitleWrapper: {
             display: 'flex',

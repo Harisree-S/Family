@@ -21,7 +21,8 @@ import {
     updateStaticCaption,
     getStaticCaptionOverrides,
     saveCoverOverride,
-    getCoverOverride
+    getCoverOverride,
+    openCloudinaryWidget
 } from '../utils/mediaStore';
 
 const containerVariants = {
@@ -68,13 +69,7 @@ const MemberDetails = () => {
     const member = familyMembers.find(m => m.id === parseInt(id));
     const { playImageAudio, playSfx, clearImageAudio, setIsVideoPlaying } = useAudio();
 
-    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-    const [isUploadingVideo, setIsUploadingVideo] = useState(false);
-    const [uploadFileType, setUploadFileType] = useState('image');
-    const [uploadFile, setUploadFile] = useState(null);
-    const imageInputRef = useRef(null);
-    const videoInputRef = useRef(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Parallax Header
     const { scrollY } = useScroll();
@@ -125,53 +120,33 @@ const MemberDetails = () => {
     }, [member, playImageAudio, clearImageAudio]);
 
     const handleUploadClick = (type) => {
-        setUploadFileType(type);
-        if (type === 'video') {
-            videoInputRef.current.click();
-        } else {
-            imageInputRef.current.click();
-        }
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setUploadFile(file);
-            setIsUploadModalOpen(true);
-        }
-        e.target.value = '';
-    };
-
-    const handleUploadSave = async ({ caption, scale, position }) => {
-        if (uploadFileType === 'video') {
-            setIsUploadingVideo(true);
-        } else {
-            setIsUploadingPhoto(true);
-        }
-
-        showToast('Uploading media... please wait', 'loading');
-
-        try {
-            if (uploadFileType === 'cover') {
-                const newCover = await saveCoverOverride(member.id, 'member', uploadFile, scale, position);
-                setProfileImage(newCover.url);
-                setProfileStyle({
-                    objectPosition: newCover.position,
-                    transform: `scale(${newCover.scale})`
-                });
-                showToast('Profile photo updated!', 'success');
-            } else {
-                await saveMedia(member.id, 'member', uploadFileType, uploadFile, caption, scale, position);
-                showToast('Uploaded successfully!', 'success');
-                fetchMedia();
+        openCloudinaryWidget(async (result) => {
+            setIsUploading(true);
+            try {
+                if (type === 'cover') {
+                    const newCover = await saveCoverOverride(member.id, 'member', result.url, result.storagePath);
+                    setProfileImage(newCover.url);
+                    setProfileStyle({
+                        objectPosition: newCover.position,
+                        transform: `scale(${newCover.scale})`
+                    });
+                    showToast('Profile photo updated!', 'success');
+                } else {
+                    // For regular media, we might want to ask for a caption first, 
+                    // but for now let's just save it and let them edit caption later.
+                    // Or we could open a modal *after* upload to set caption/scale.
+                    // To keep it simple and robust: save immediately.
+                    await saveMedia(member.id, 'member', result.type, result.url, result.storagePath);
+                    showToast('Uploaded successfully!', 'success');
+                    fetchMedia();
+                }
+            } catch (error) {
+                console.error('Save failed:', error);
+                showToast(`Save failed: ${error.message}`, 'error');
+            } finally {
+                setIsUploading(false);
             }
-        } catch (error) {
-            console.error('Upload failed:', error);
-            showToast(`Upload failed: ${error.message}`, 'error');
-        } finally {
-            setIsUploadingPhoto(false);
-            setIsUploadingVideo(false);
-        }
+        });
     };
 
     const handleMediaClick = (item, type) => {
@@ -269,15 +244,6 @@ const MemberDetails = () => {
                     title="Edit Caption"
                 />
 
-                <UploadModal
-                    isOpen={isUploadModalOpen}
-                    onClose={() => setIsUploadModalOpen(false)}
-                    onSave={handleUploadSave}
-                    file={uploadFile}
-                    type={uploadFileType}
-                    aspectRatio={1}
-                />
-
                 <ConfirmModal
                     isOpen={confirmModal.isOpen}
                     title={confirmModal.title}
@@ -286,21 +252,6 @@ const MemberDetails = () => {
                     onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
                     isDangerous={confirmModal.isDangerous}
                     confirmText="Delete"
-                />
-
-                <input
-                    type="file"
-                    ref={imageInputRef}
-                    style={{ display: 'none' }}
-                    accept="image/*,.jpg,.jpeg,.png,.gif,.webp,.svg"
-                    onChange={handleFileChange}
-                />
-                <input
-                    type="file"
-                    ref={videoInputRef}
-                    style={{ display: 'none' }}
-                    accept="video/*,.mp4,.mov,.webm,.ogg,.avi,.mkv,.wmv"
-                    onChange={handleFileChange}
                 />
 
                 <div className="container">
@@ -350,16 +301,16 @@ const MemberDetails = () => {
                                 <button
                                     onClick={() => handleUploadClick('image')}
                                     style={styles.actionBtn}
-                                    disabled={isUploadingPhoto || isUploadingVideo}
+                                    disabled={isUploading}
                                 >
-                                    <ImageIcon size={18} /> {isUploadingPhoto ? 'Uploading...' : 'Add Photo'}
+                                    <ImageIcon size={18} /> {isUploading ? 'Uploading...' : 'Add Photo'}
                                 </button>
                                 <button
                                     onClick={() => handleUploadClick('video')}
                                     style={styles.actionBtn}
-                                    disabled={isUploadingPhoto || isUploadingVideo}
+                                    disabled={isUploading}
                                 >
-                                    <Play size={18} /> {isUploadingVideo ? 'Uploading...' : 'Add Video'}
+                                    <Play size={18} /> {isUploading ? 'Uploading...' : 'Add Video'}
                                 </button>
                             </div>
                         </motion.div>

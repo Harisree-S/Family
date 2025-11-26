@@ -17,38 +17,64 @@ const COVERS_COLLECTION = 'covers';
 const CLOUDINARY_CLOUD_NAME = 'dpfxu4gkw';
 const CLOUDINARY_UPLOAD_PRESET = 'ls_family';
 
-// Helper to upload to Cloudinary
-const uploadToCloudinary = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    formData.append('resource_type', 'auto'); // Auto-detect image or video
-
-    const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
-        method: 'POST',
-        body: formData
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Cloudinary upload failed');
+// Helper to open Cloudinary Widget
+export const openCloudinaryWidget = (onSuccess) => {
+    if (!window.cloudinary) {
+        console.error("Cloudinary script not loaded");
+        return;
     }
 
-    const data = await response.json();
-    return {
-        url: data.secure_url,
-        storagePath: data.public_id // We store public_id as storagePath
-    };
+    const myWidget = window.cloudinary.createUploadWidget({
+        cloudName: CLOUDINARY_CLOUD_NAME,
+        uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+        sources: ['local', 'url', 'camera'],
+        showAdvancedOptions: false,
+        cropping: false,
+        multiple: false,
+        defaultSource: "local",
+        styles: {
+            palette: {
+                window: "#030305",
+                windowBorder: "#d4af37",
+                tabIcon: "#d4af37",
+                menuIcons: "#d4af37",
+                textDark: "#000000",
+                textLight: "#FFFFFF",
+                link: "#d4af37",
+                action: "#d4af37",
+                inactiveTabIcon: "#666666",
+                error: "#F44235",
+                inProgress: "#0078FF",
+                complete: "#20B832",
+                sourceBg: "#1a1a1a"
+            },
+            fonts: {
+                default: null,
+                "'Outfit', sans-serif": {
+                    url: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap",
+                    active: true
+                }
+            }
+        }
+    }, (error, result) => {
+        if (!error && result && result.event === "success") {
+            console.log('Done! Here is the image info: ', result.info);
+            onSuccess({
+                url: result.info.secure_url,
+                storagePath: result.info.public_id,
+                type: result.info.resource_type
+            });
+        }
+    });
+
+    myWidget.open();
 };
 
 // --- Media Management (Photos/Videos) ---
 
-export const saveMedia = async (parentId, category, type, file, caption = '', scale = 1, position = 'center') => {
+export const saveMedia = async (parentId, category, type, url, storagePath, caption = '', scale = 1, position = 'center') => {
     try {
-        // 1. Upload file to Cloudinary
-        const { url, storagePath } = await uploadToCloudinary(file);
-
-        // 2. Save metadata to Firestore
+        // Metadata is saved to Firestore
         const mediaItem = {
             parentId: parseInt(parentId),
             category, // 'member' or 'memory'
@@ -115,12 +141,9 @@ export const updateMedia = async (id, updates) => {
 
 // --- Cover Overrides ---
 
-export const saveCoverOverride = async (parentId, type, file, scale = 1, position = 'center') => {
+export const saveCoverOverride = async (parentId, type, url, storagePath, scale = 1, position = 'center') => {
     try {
-        // 1. Upload to Cloudinary
-        const { url, storagePath } = await uploadToCloudinary(file);
-
-        // 2. Save/Update in Firestore
+        // Save/Update in Firestore
         const id = `${type}-${parentId}`;
         const coverItem = {
             url: url,
