@@ -12,12 +12,45 @@ import { familyMembers } from './data/familyData';
 import { AnimatePresence } from 'framer-motion';
 
 import ScrollToTop from './components/ScrollToTop';
+import { AudioProvider } from './components/AudioController';
+import CustomCursor from './components/CustomCursor';
+import PageTransition from './components/PageTransition';
+import Login from './components/Login';
+
+const PASSWORD = "Shunnani@2025"; // Simple client-side password
 
 function App() {
   const location = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+
+  React.useEffect(() => {
+    const auth = sessionStorage.getItem('is_authenticated');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (password) => {
+    if (password === PASSWORD) {
+      sessionStorage.setItem('is_authenticated', 'true');
+      setIsAuthenticated(true);
+      return true;
+    }
+    return false;
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <AudioProvider>
+        <CustomCursor />
+        <Login onLogin={handleLogin} />
+      </AudioProvider>
+    );
+  }
 
   return (
-    <>
+    <AudioProvider>
+      <CustomCursor />
       <ScrollToTop />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
@@ -26,35 +59,45 @@ function App() {
           <Route path="/memory/:id" element={<MemoryDetails />} />
         </Routes>
       </AnimatePresence>
-    </>
+    </AudioProvider>
   );
 }
 
-const Home = () => (
-  <div>
-    <Hero />
+const Home = () => {
+  const [opacity, setOpacity] = React.useState(0);
 
-    <section style={styles.membersSection}>
-      <div className="container">
-        <h2 className="section-title">The Family</h2>
-        <div className="members-grid">
-          {familyMembers.map((member, index) => (
-            <MemberCard key={member.id} member={member} index={index} />
-          ))}
+  React.useLayoutEffect(() => {
+    // Small delay to allow scroll restoration to happen first
+    const timer = setTimeout(() => setOpacity(1), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <PageTransition>
+      <Hero />
+
+      <section style={styles.membersSection}>
+        <div className="container">
+          <h2 className="section-title">The Family</h2>
+          <div className="members-grid">
+            {familyMembers.map((member, index) => (
+              <MemberCard key={member.id} member={member} index={index} />
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <EventsSection />
+      <EventsSection />
 
-    <Gallery />
+      <Gallery />
 
-    <footer style={styles.footer}>
-      <p>&copy; {new Date().getFullYear()} Lalitham Sundaram. All rights reserved.</p>
-      <p style={styles.footerNote}>Made with love for the family.</p>
-    </footer>
-  </div>
-);
+      <footer style={styles.footer}>
+        <p>&copy; {new Date().getFullYear()} Lalitham Sundaram. All rights reserved.</p>
+        <p style={styles.footerNote}>Made with love for the family.</p>
+      </footer>
+    </PageTransition>
+  );
+};
 
 
 const styles = {

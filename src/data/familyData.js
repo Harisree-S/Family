@@ -21,7 +21,7 @@ import AppaPhoto5 from '../assets/Appa/5.jpg';
 import AmmaPhoto1 from '../assets/Amma/1.jpg';
 import AmmaPhoto2 from '../assets/Amma/2.jpg';
 import AmmaPhoto3 from '../assets/Amma/3.jpg';
-import AmmaPhoto9 from '../assets/Amma/9.mp4';
+// import AmmaPhoto9 from '../assets/Amma/9.mp4';
 import AmmaPhoto10 from '../assets/Amma/10.mp4';
 import AmmaPhoto11 from '../assets/Amma/11.mp4';
 import AmmaPhoto12 from '../assets/Amma/12.mp4';
@@ -68,18 +68,29 @@ import unniPhoto4 from '../assets/Unni/4.jpg';
 import unniPhoto5 from '../assets/Unni/5.jpg';
 import unniPhoto6 from '../assets/Unni/6.jpg';
 import unniPhoto7 from '../assets/Unni/7.jpg';
-
+import appaTheme from '../assets/audio/appa_theme.mp3';
+import ammaTheme from '../assets/audio/amma_theme.mp3';
+import chithaTheme from '../assets/audio/chitha_theme.mp3';
+import ammammaTheme from '../assets/audio/ammamma_theme.mp3';
+import prabhuTheme from '../assets/audio/prabhu_theme.mp3';
+import sukuTheme from '../assets/audio/suku_theme.mp3';
+import arjunTheme from '../assets/audio/arjun_theme.mp3';
+import snehaTheme from '../assets/audio/sneha_theme.mp3';
+import unniTheme from '../assets/audio/unni_theme.mp3';
+//
 
 export const familyMembers = [
   {
     id: 9,
     name: "Ammamma",
-    birthday: "In her 70's", // Not provided
+    //birthday: "", // Not provided
     photo: ammammaPhoto,
-    imagePosition: "50% 40%",
+    imagePosition: "50% 15%",
     phone: "",
     instagram: "",
-    bio: "The Matriarch. The source of hardwork and delicious food.",
+    bio: "The root of our family tree",
+    entryAudio: ammammaTheme,
+    audioVolume: 0.24,
     photos: [
       //{ url: ammammaPhoto, caption: "Ammamma at Prabhu & Suku Wedding" },
       { url: AmmammaPhoto1, caption: "Let's check this out!" },
@@ -98,14 +109,16 @@ export const familyMembers = [
     //relation: "Father",
     birthday: "1965-07-24",
     photo: appaPhoto,
-    imagePosition: "50% 40%",
+    entryAudio: appaTheme,
+    audioVolume: 0.11,
+    imagePosition: "50% 20%",
     phone: "+91 7510132875",
     instagram: "https://www.instagram.com/ansundaran?igsh=Z3VvaDd3aHdzZHo=",
-    bio: "The Chairman. Major pillar in family",
-    imagePosition: "0% 0%",
+    bio: "The strong foundation our family stands on",
+
     photos: [
       //{ url: appaPhoto, caption: "Appa at Arjun & Sneha Wedding", position: "0% 25%" },
-      { url: AppaPhoto2, caption: "Entha ivaru cheyyane?", position: "0% 33%" },
+      { url: AppaPhoto2, caption: "Entha ivaru cheyyane?", position: "0% 33%" }, // Example photo audio
       { url: AppaPhoto3, caption: "Young version", scale: "0.8", position: "0% 40%" }
     ],
     videos: [
@@ -118,19 +131,22 @@ export const familyMembers = [
     //relation: "Mother",
     birthday: "1970-03-22",
     photo: ammaPhoto,
+    entryAudio: ammaTheme,
+    audioVolume: 0.14,
     phone: "+91 7592868339",
     instagram: "https://www.instagram.com/mommycool1?igsh=MWN2NnoyYnNudGhucQ==",
-    bio: "The Supreme Court. The one who feeds the delicious food & showers Love.",
-    imagePosition: "0% 60%",
+    bio: "Love personified",
+    imagePosition: "50% 20%",
+
     photos: [
-      { url: ammaPhoto, caption: "Amma @ Chottanikkara" },
-      { url: AmmaPhoto1, caption: "Another Chottanikkara pic", scale: "0.8", position: "0% 60%" },
-      { url: AmmaPhoto2, caption: ":)", position: "30% 10%" },
-      { url: AmmaPhoto3, caption: "Hehe", scale: 0.8, position: "30% 40%" },
+      //{ url: ammaPhoto, caption: "Chottanikkara Amma" },
+      { url: AmmaPhoto1, caption: "Chottanikkara Amma", scale: "0.8", position: "0% 60%" },
+      { url: AmmaPhoto2, caption: "Nan vannu", position: "30% 10%" },
+      { url: AmmaPhoto3, caption: "Crazy frog?", scale: 0.8, position: "30% 40%" },
 
     ],
     videos: [
-      { url: AmmaPhoto9, caption: "HillPalace Visit", thumbnail: AmmaPhoto13 },
+      //{ url: AmmaPhoto9, caption: "HillPalace Visit", thumbnail: AmmaPhoto13 },
       { url: AmmaPhoto10, caption: "Birthday" },
       { url: AmmaPhoto11, caption: "Leo Das" },
       { url: AmmaPhoto12, caption: "Vegam veettil potte" }
@@ -142,10 +158,13 @@ export const familyMembers = [
     //relation: "Uncle",
     birthday: "1973-01-26",
     photo: chithaPhoto,
+    entryAudio: chithaTheme,
+    audioVolume: 0.14,
     phone: "+91 8606181284",
     instagram: "https://www.instagram.com/murukan.a.n?igsh=ajIxbXlweTRjN2U5",
-    imagePosition: "0% 15%",
-    bio: "Honorary Board Member. Shows up sometimes, gives support.",
+    imagePosition: "50% 15%",
+    bio: "Official supplier of laughter & good times",
+    //entryAudio: sAudio,
     photos: [
       //{ url: chithaPhoto, caption: "Chitha @ Prabhu & Suku Wedding", position: " 0% 17%" },
       { url: chithaPhoto1, caption: "Young Version", position: " 0% 17%" },
@@ -161,15 +180,17 @@ export const familyMembers = [
     //relation: "Brother-in-Law",
     birthday: "1987-07-28",
     photo: prabhuPhoto,
-    imagePosition: "0% 0%",
+    imagePosition: "50% 15%",
     phone: "+91 9847627222",
     instagram: "https://www.instagram.com/prabhat_ps_?igsh=MXczaWFsOTVoeHNpdg==",
-    bio: "The Diplomat. Nodding and smiling!.",
+    bio: "Brought new joy & laughter to our lives",
+    entryAudio: prabhuTheme,
+    audioVolume: 0.2,
     photos: [
-      { url: prabhuPhoto, caption: "Chiri", position: "0% 0%" },
-      { url: prabhuPhoto1, caption: "Eppadi", position: "0% 10%" },
+      //{ url: prabhuPhoto, caption: "Chiri", position: "0% 0%" },
+      { url: prabhuPhoto1, caption: "Indha look eppadi", position: "0% 10%" },
       { url: prabhuPhoto2, caption: "Hmmm", position: "0% 0%" },
-      { url: prabhuPhoto3, caption: "Style alle", position: "0% 60%" },
+      { url: prabhuPhoto3, caption: "Ente ee style alle", position: "0% 60%" },
       { url: prabhuPhoto4, caption: "Transformation", position: "0% 40%" },
       { url: prabhuPhoto5, caption: "Hello Guys", position: "0% 0%" },
       { url: prabhuPhoto6, caption: "Fronx", position: "0% 50%" },
@@ -186,16 +207,18 @@ export const familyMembers = [
     photo: sukuPhoto,
     phone: "+91 9620285532",
     instagram: "https://www.instagram.com/mrss_achary?igsh=NWQzMXJ3NmF4NHdm",
-    imagePosition: "0% 46%",
-    bio: "The Assistant Manager. Bossy, opinionated, and thinks she’s the third parent.",
+    imagePosition: "50% 25%",
+    bio: "Always looking out for us with a lovely heart",
+    entryAudio: sukuTheme,
+    audioVolume: 0.2,
     photos: [
-      { url: sukuPhoto, caption: "Enganund enne kaanan" },
+      //{ url: sukuPhoto, caption: "Enganund enne kaanan" },
       { url: sukuPhoto1, caption: "Umm", position: "0% 30%" },
-      { url: sukuPhoto2, caption: "Cave", position: "0% 70%" },
-      { url: sukuPhoto3, caption: "Enganund enne kaanan" },
+      { url: sukuPhoto2, caption: "Atha angot nokku", position: "0% 70%" },
+      //{ url: sukuPhoto3, caption: "Enganund enne kaanan" },
       { url: sukuPhoto4, caption: "Vellam veno", position: "0% 8%" },
-      { url: sukuPhoto5, caption: "Enganund enne kaanan" },
-      { url: sukuPhoto6, caption: "In Car", position: "0% 80%" },
+      // { url: sukuPhoto5, caption: "Enganund enne kaanan" },
+      { url: sukuPhoto6, caption: "Bhakthi", position: "0% 80%" },
       { url: sukuPhoto7, caption: "Fronx" },
       { url: sukuPhoto8, caption: "Hairstyle :)", position: "0% 36%" },
       { url: sukuPhoto9, caption: "Young Version", position: "0% 5%" },
@@ -214,16 +237,18 @@ export const familyMembers = [
     photo: arjunPhoto,
     phone: "+974 59942197",
     instagram: "https://www.instagram.com/__arjun.ashok__?igsh=N2dlMTB6d2UzeDg=",
-    imagePosition: "0% 46%",
-    bio: "The New Recruit. Still learning the complex rules of this house.",
+    imagePosition: "50% 15%",
+    bio: "Brings vibes & extra laughter to the family",
+    entryAudio: arjunTheme,
+    audioVolume: 0.2,
     photos: [
-      { url: arjunPhoto, caption: "Nere Nokkilla" },
-      { url: arjunPhoto1, caption: "Hmmm", position: "0% 10%" },
+      //{ url: arjunPhoto, caption: "Nere Nokkilla" },
+      { url: arjunPhoto1, caption: "Look alle", position: "0% 10%" },
       { url: arjunPhoto2, caption: "Ini angot nokkam", position: "0% 0%" },
       { url: arjunPhoto3, caption: "Younger Version with Arsha", position: "0% 20%" },
     ],
     videos: [
-      { url: arjunPhoto4, caption: "Kammal" }
+      { url: arjunPhoto4, caption: "Photo" }
     ]
   },
   {
@@ -234,19 +259,21 @@ export const familyMembers = [
     photo: snehaPhoto,
     phone: "+91 9895094732",
     instagram: "https://www.instagram.com/sneha_shruti?igsh=bzJ3dXl0MXJuZHNz",
-    imagePosition: "0% 46%",
-    bio: "The Public Relations Officer. Talks the most, Public Figure",
+    imagePosition: "50% 25%",
+    bio: "A beautiful soul with an infectious smile!",
+    entryAudio: snehaTheme,
+    audioVolume: 0.1,
     photos: [
-      { url: snehaPhoto, caption: "Sneha" },
+      //{ url: snehaPhoto, caption: "Sneha" },
       { url: snehaPhoto1, caption: "Anwar", position: "0% 20%" },
-      { url: snehaPhoto2, caption: "Ummm", position: "0% 30%" },
-      { url: snehaPhoto3, caption: "Look alle", position: "0% 50%" },
+      { url: snehaPhoto2, caption: "Umm", position: "0% 30%" },
+      { url: snehaPhoto3, caption: "Pinky mol", position: "0% 50%" },
       { url: snehaPhoto4, caption: "Younger Version", position: "0% 12%" },
       { url: snehaPhoto5, caption: "Ith ente puthiya Ray Ban glass", position: "0% 40%" },
       { url: snehaPhoto6, caption: "Aussie", position: "0% 23%" },
       { url: snehaPhoto7, caption: "zzz", position: "0% 0%" },
       { url: snehaPhoto8, caption: "Prabhu & Suku Engagement", position: "0% 20%" },
-      { url: snehaPhoto9, caption: "Bye Bye", position: "0% 50%" },
+      { url: snehaPhoto9, caption: "Ang Australialekk oru parakkal", position: "0% 50%" },
       { url: snehaPhoto10, caption: "Bride to Be", position: "0% 50%" },
     ],
     videos: [
@@ -263,11 +290,14 @@ export const familyMembers = [
     photo: unniPhoto,
     phone: "+91 7510132875",
     instagram: "https://www.instagram.com/harisree____s?igsh=MWh5ZnF4OTAxcmU4cQ==",
-    bio: "The Crown Prince. The undisputed favorite (don't ask the sisters).",
+    bio: "Last to arrive, surrounded by love",
+    imagePosition: "50% 20%",
+    entryAudio: unniTheme,
+    audioVolume: 0.2,
     photos: [
-      { url: unniPhoto, caption: "Unni", position: "0% 15%" },
-      { url: unniPhoto1, caption: "Dalmatian", position: "0% 15%" },
-      { url: unniPhoto3, caption: "Aadhar", position: "0% 42%" },
+      //{ url: unniPhoto, caption: "Unni", position: "0% 15%" },
+      { url: unniPhoto1, caption: "Munnar", position: "0% 15%" },
+      { url: unniPhoto3, caption: "Aadhar card version", position: "0% 42%" },
       { url: unniPhoto4, caption: "Young Version", position: "0% 25%" },
       { url: unniPhoto5, caption: "Pro", position: "0% 30%" },
       { url: unniPhoto6, caption: "Echo Echo", position: "0% 30%" },

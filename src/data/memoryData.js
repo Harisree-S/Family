@@ -28,7 +28,7 @@ import ASPhoto18 from '../assets/Wedding2/V3.mp4';
 import ASPhoto19 from '../assets/Wedding2/V4.mp4';
 import ASPhoto20 from '../assets/Wedding2/V5.mp4';
 import ASPhoto21 from '../assets/Wedding2/V6.mp4';
-//import ASPhoto22 from '../assets/Wedding2/V7.mp4';
+import ASPhoto30 from '../assets/Wedding2/V7.mp4';
 import SLPhoto1 from '../assets/SL/1.jpg';
 import SLPhoto2 from '../assets/SL/2.jpg';
 import SLPhoto3 from '../assets/SL/3.jpg';
@@ -96,32 +96,49 @@ import M23 from '../assets/Family/23.mp4';
 import M24 from '../assets/Family/24.mp4';
 
 
+import sAudio from '../assets/audio/s.mp3';
+
+import PSwedAudio from '../assets/audio/PS_wed.mp3';
+import ASwedAudio from '../assets/audio/AS_wed.mp3';
+import SLAudio from '../assets/audio/SL.mp3';
+import ASAudio from '../assets/audio/AS.mp3';
+import PSAudio from '../assets/audio/PS.mp3';
+
+import candidAudio from '../assets/audio/candid.mp3';
+
+import { audio } from 'framer-motion/client';
+
 export const memories = [
     {
         id: 1,
         title: "Prabhu & Suku Wedding",
-        cover: PSPhoto1, position: "0% 30%",
-        description: "A wonderful time spent together with the whole family.",
+        cover: PSPhoto1,
+        coverPosition: "50% 5%",
+        coverScale: 1.0,
+        description: "When our first princess found her prince!",
+        entryAudio: PSwedAudio,
+        audioVolume: 0.2,
         photos: [
-            { url: PSPhoto9, caption: "Eppadi?", position: "0% 32%" },
-            { url: PSPhoto3, caption: "Family meet", position: "0% 25%" },
-            { url: PSPhoto6, caption: "Family meet pic again", position: "0% 32%" },
+            { url: PSPhoto9, caption: "Impressed?", position: "0% 32%" },
+            { url: PSPhoto3, caption: "@ Family meet", position: "0% 25%" },
+            { url: PSPhoto6, caption: "Family meet pic again", position: "0% 30%" },
             { url: PSPhoto8, caption: "Lovely", position: "0% 32%" },
             { url: PSPhoto4, caption: "Pre-wedding shoot alaparaigal", position: "0% 32%" },
             { url: PSPhoto5, caption: "Play the song - Perfect by Ed-Sheeran", position: "0% 32%" },
             { url: PSPhoto2, caption: "Engagement vibes", position: "0% 30%" },
             { url: PSPhoto7, caption: "Happily Married!", position: "0% 46%" },
-
         ],
-        videos: [
-            //{ url: "https://www.w3schools.com/html/mov_bbb.mp4", caption: "Fun moments" }
-        ]
+        videos: []
     },
     {
         id: 2,
         title: "Arjun & Sneha Wedding",
         cover: ASPhoto1,
-        description: "Love was in the Air.",
+        coverPosition: "50% 24%",
+        coverScale: 1.0,
+        description: "Writing the next beautiful chapter of our family story",
+        entryAudio: ASwedAudio,
+        audioVolume: 0.11,
         photos: [
             { url: ASPhoto2, caption: "Bride to Be!", position: "0% 46%" },
             { url: ASPhoto6, caption: "Gorgeous", position: "0% 22%" },
@@ -129,7 +146,7 @@ export const memories = [
             { url: ASPhoto4, caption: "Ammamma Love", position: "0% 30%" },
             { url: ASPhoto5, caption: "The Moment", position: "0% 32%" },
             { url: ASPhoto9, caption: "Happily Married!", position: "0% 32%" },
-            { url: ASPhoto7, caption: "Eppadi?", position: "0% 32%" },
+            //{ url: ASPhoto7, caption: "Eppadi?", position: "0% 32%" },
             { url: ASPhoto8, caption: "Frame parunga Ji", position: "0% 25%" },
             { url: ASPhoto10, caption: ":)", position: "0% 46%" },
             { url: ASPhoto11, caption: "Chetta oru pravishyam koodi", position: "0% 50%" },
@@ -139,26 +156,32 @@ export const memories = [
             { url: ASPhoto15, caption: "Amma Love", position: "0% 32%" },
         ],
         videos: [
-            { url: ASPhoto17, caption: "Bride to Be!" },
+            { url: ASPhoto17, caption: "Bride" },
             { url: ASPhoto19, caption: "Pre-Wedding" },
             { url: ASPhoto16, caption: "Pre-Wedding edit" },
             { url: ASPhoto20, caption: "Makeover" },
             { url: ASPhoto18, caption: "Wedding Story" },
-            { url: ASPhoto21, caption: "Husky" }
+            { url: ASPhoto30, caption: "Alfa Horizon" },
+            { url: ASPhoto21, caption: "Husky Trend" }
         ]
     },
     {
         id: 3,
         title: "Appa & Amma",
         cover: SLPhoto1,
-        description: "35 years of Love and Happiness.",
+        coverPosition: "50% 35%",
+        coverScale: 1.0,
+        description: "35 years of Love and Happiness",
+        entryAudio: SLAudio,
+        audioVolume: 0.3,
         photos: [
             { url: SLPhoto2, caption: "Since 1990", position: "0% 6%" },
             { url: SLPhoto3, caption: ":)", position: "0% 12%" },
-            { url: SLPhoto4, caption: "Love", position: "0% 30%" },],
+            { url: SLPhoto4, caption: "Love", position: "0% 30%" },
+        ],
         videos: [
             { url: SLPhoto5, caption: "Fun" },
-            { url: SLPhoto6, caption: "He He" },
+            { url: SLPhoto6, caption: "Laughter" },
             { url: SLPhoto7, caption: "Anniversary edit" },
         ]
     },
@@ -166,46 +189,52 @@ export const memories = [
         id: 4,
         title: "Arjun & Sneha",
         cover: AS1Photo1,
-        description: "Love & Happiness",
+        coverPosition: "50% 2%",
+        coverScale: 1.0,
+        description: "Side by Side, Hand in Hand, Heart to Heart",
+        entryAudio: ASAudio,
+        audioVolume: 0.12,
         photos: [
             { url: AS1Photo2, caption: "Since 2025", position: "0% 0%" },
-            { url: AS1Photo3, caption: "ilikal", position: "0% 0%" },
+            { url: AS1Photo3, caption: "Chiri", position: "0% 0%" },
             { url: AS1Photo4, caption: "Cubbon Park", position: "0% 40%" },
             { url: AS1Photo5, caption: "Yellove!", position: "0% 54%" },
             { url: AS1Photo6, caption: "eeeee", position: "0% 0%" },
-            { url: AS1Photo7, caption: "Since 2025", position: "0% 0%" },
-            //{ url: AS1Photo8, caption: "Happiness!", position: "0% 0%" },
+            { url: AS1Photo7, caption: "Selfie", position: "0% 0%" },
         ],
         videos: [
-            { url: AS1Photo9, caption: ":)" },
-            { url: AS1Photo8, caption: "Arjun edit" }
+            { url: AS1Photo9, caption: "Pandhalam" },
+            { url: AS1Photo8, caption: "Editor Aju" }
         ]
     },
     {
         id: 5,
         title: "Prabhu & Suku",
         cover: PS1Photo15,
-        description: "Together in Love",
+        coverPosition: "50% 31.5%",
+        coverScale: 1.0,
+        description: "The Happy Couple",
+        entryAudio: PSAudio,
+        audioVolume: 0.19,
         photos: [
             { url: PS1Photo2, caption: "Happiness!", position: "0% 20%" },
             { url: PS1Photo3, caption: ":)", position: "0% 20%" },
-            { url: PS1Photo4, caption: "eeee", position: "0% 30%" },
+            { url: PS1Photo4, caption: "Smile!", position: "0% 30%" },
             { url: PS1Photo5, caption: ".....", position: "0% 50%" },
             { url: PS1Photo6, caption: "ilikal", position: "0% 30%" },
-            { url: PS1Photo7, caption: "Happy", position: "0% 10%" },
+            { url: PS1Photo7, caption: "Aesthetics", position: "0% 10%" },
             { url: PS1Photo8, caption: "Idak idak ee pose idum", position: "0% 10%" },
             { url: PS1Photo9, caption: "Oonjal", position: "0% 60%" },
             { url: PS1Photo10, caption: "Variety alle", position: "0% 15%" },
             { url: PS1Photo11, caption: "Bhakthi", position: "0% 46%" },
-            { url: PS1Photo12, caption: ":)", position: "0% 50%" },
-            { url: PS1Photo13, caption: "Onam", position: "0% 30%" },
+            { url: PS1Photo12, caption: "@ a function", position: "0% 50%" },
+            { url: PS1Photo13, caption: "Onam & Payasam", position: "0% 30%" },
             { url: PS1Photo14, caption: "Thrissur", position: "0% 40%" },
-            { url: PS1Photo15, caption: "Happiness!", position: "0% 8%" },
-            { url: PS1Photo16, caption: ":)", position: "0% 8%" },
+            //{ url: PS1Photo15, caption: "Bangalore", position: "0% 30%" },
+            //{ url: PS1Photo16, caption: ":)", position: "0% 8%" },
             { url: PS1Photo17, caption: "Shades", position: "0% 40%" },
             { url: PS1Photo18, caption: "Padmanabhante Mannil", position: "0% 30%" },
-            { url: PS1Photo19, caption: ":)", position: "0% 20%" },
-            //{ url: PS1Photo20, caption: "Happiness!", position: "0% 10%" },
+            { url: PS1Photo19, caption: "Wrapped in Love", position: "0% 20%" },
             { url: PS1Photo21, caption: "Forum Mall", position: "0% 10%" },
         ],
         videos: [
@@ -216,25 +245,26 @@ export const memories = [
     {
         id: 6,
         title: "Moments",
-        cover: M5,
-        description: "Beautiful moments captured.",
+        cover: M7,
+        coverPosition: "50% 50%",
+        coverScale: 1.0,
+        description: "Time flies, memories stay",
+        entryAudio: candidAudio,
+        audioVolume: 0.25,
         photos: [
-            { url: M2, caption: "Hi Hi", position: "0% 10%" },
-            { url: M3, caption: ":)", position: "0% 0%" },
+            { url: M2, caption: "Years back", position: "0% 10%" },
+            { url: M3, caption: "Tripunithura", position: "0% 0%" },
             { url: M4, caption: "Meeting", position: "0% 30%" },
-            //{ url: M5, caption: "Hi Hi", position: "0% 10%" },
             { url: M6, caption: "Aussie & others", position: "0% 40%" },
-            { url: M7, caption: "Forum Mall", position: "0% 60%" },
             { url: M8, caption: "Appa Selfie", position: "0% 50%" },
             { url: M9, caption: "eee", position: "0% 40%" },
             { url: M10, caption: "Aussie again", position: "0% 30%" },
-            //{ url: M11, caption: "Hi Hi", position: "0% 40%", scale: "0.5" },
             { url: M12, caption: "Ammayum Molum", position: "0% 30%" },
             { url: M13, caption: "Akka Wedding!", position: "0% 30%" },
             { url: M14, caption: "Kollalo", position: "0% 10%" },
             { url: M15, caption: "Shunnani Veettilekk ", position: "0% 10%" },
             { url: M16, caption: "Sooryane ang kittanillallo", position: "0% 30%" },
-            //{ url: M17, caption: "Hi Hi", position: "0% 10%" },
+            //{ url: M7, caption: "Forum Mall", position: "0% 60%" },
             { url: M18, caption: "Onam", position: "0% 55%" },
             { url: M19, caption: "Rameshwaram Cafe", position: "0% 20%" },
             { url: M20, caption: "Lovely", position: "0% 10%" },
