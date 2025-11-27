@@ -118,7 +118,6 @@ const Home = () => {
 
       <footer className="py-8 text-center text-[#888] text-sm relative z-10">
         <p>&copy; 2024 Lalitham Sundharam. All rights reserved.</p>
-        <p style={{ color: 'red', fontWeight: 'bold' }}>VERSION: DEBUG-FIX-1 (If you do not see this, REFRESH)</p>
       </footer>
     </PageTransition>
   );
