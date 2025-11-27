@@ -39,6 +39,11 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
                             style={styles.media}
                             muted
                             playsInline
+                            preload="metadata"
+                            onError={(e) => {
+                                console.error("Video error:", item.url);
+                                e.target.style.display = 'none'; // Hide broken video to show background
+                            }}
                         />
                         <div style={styles.playOverlay}>
                             <Play size={40} fill="rgba(255,255,255,0.8)" color="transparent" />
@@ -51,9 +56,14 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
                         loading="lazy"
                         style={{
                             ...styles.media,
-                            objectPosition: item.position || '50% 20%', // Smart default: Top-Center
+                            objectPosition: item.position || '50% 20%',
                             transform: item.scale ? `scale(${item.scale})` : 'scale(1)',
-                            filter: 'contrast(1.05) saturate(1.1)' // Cinematic look
+                            filter: 'contrast(1.05) saturate(1.1)'
+                        }}
+                        onError={(e) => {
+                            console.error("Image load error:", item.url);
+                            e.target.style.opacity = 0.5; // Dim broken image
+                            e.target.src = 'https://placehold.co/600x400/1a1a1a/d4af37/png?text=Image+Error'; // Fallback
                         }}
                     />
                 )}
