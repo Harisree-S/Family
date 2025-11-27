@@ -118,7 +118,6 @@ const MemoryDetails = () => {
 
 
     const [uploadingType, setUploadingType] = useState(null); // 'photo' | 'video' | null
-    const [debugError, setDebugError] = useState(null);
 
     useEffect(() => {
         if (memory && memory.entryAudio) {
@@ -143,9 +142,9 @@ const MemoryDetails = () => {
                         const newMedia = await saveMedia(memory.id, 'memory', result.type, result.url, result.storagePath);
 
                         if (result.type === 'video') {
-                            setUploadedVideos(prev => [...prev, newMedia]);
+                            setUploadedVideos(prev => [newMedia, ...prev]);
                         } else {
-                            setUploadedPhotos(prev => [...prev, newMedia]);
+                            setUploadedPhotos(prev => [newMedia, ...prev]);
                         }
 
                         showToast('Uploaded successfully!', 'success');
@@ -246,8 +245,8 @@ const MemoryDetails = () => {
             }));
     };
 
-    const allPhotos = [...processMedia(memory.photos || []), ...uploadedPhotos];
-    const allVideos = [...processMedia(memory.videos || []), ...uploadedVideos];
+    const allPhotos = [...uploadedPhotos, ...processMedia(memory.photos || [])];
+    const allVideos = [...uploadedVideos, ...processMedia(memory.videos || [])];
 
     return (
         <PageTransition>

@@ -8,6 +8,17 @@ const ImageModal = ({ isOpen, mediaSrc, type, caption, onClose }) => {
     const isVideo = type === 'video' || (mediaSrc && (mediaSrc.endsWith('.mp4') || mediaSrc.startsWith('data:video')));
     const videoRef = useRef(null);
 
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
     // Handle visibility change for video
     useEffect(() => {
         if (!isOpen || !isVideo) return;

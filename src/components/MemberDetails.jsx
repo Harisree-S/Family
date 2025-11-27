@@ -76,7 +76,6 @@ const MemberDetails = () => {
     const opacityHeader = useTransform(scrollY, [0, 300], [1, 0.5]);
 
     const [uploadingType, setUploadingType] = useState(null); // 'photo' | 'video' | null
-    const [debugError, setDebugError] = useState(null);
 
     useEffect(() => {
         if (!member) return;
@@ -90,10 +89,9 @@ const MemberDetails = () => {
                 const videos = media.filter(m => m.type === 'video');
                 setUploadedPhotos(photos);
                 setUploadedVideos(videos);
-                setDebugError(null);
             },
             (error) => {
-                setDebugError(error.message);
+                console.error("Subscription error:", error);
             }
         );
 
@@ -141,9 +139,9 @@ const MemberDetails = () => {
                         const newMedia = await saveMedia(member.id, 'member', result.type, result.url, result.storagePath);
 
                         if (result.type === 'video') {
-                            setUploadedVideos(prev => [...prev, newMedia]);
+                            setUploadedVideos(prev => [newMedia, ...prev]);
                         } else {
-                            setUploadedPhotos(prev => [...prev, newMedia]);
+                            setUploadedPhotos(prev => [newMedia, ...prev]);
                         }
 
                         showToast('Uploaded successfully!', 'success');
@@ -245,8 +243,8 @@ const MemberDetails = () => {
             }));
     };
 
-    const allPhotos = [...processMedia(member.photos || []), ...uploadedPhotos];
-    const allVideos = [...processMedia(member.videos || []), ...uploadedVideos];
+    const allPhotos = [...uploadedPhotos, ...processMedia(member.photos || [])];
+    const allVideos = [...uploadedVideos, ...processMedia(member.videos || [])];
 
     return (
         <PageTransition>
