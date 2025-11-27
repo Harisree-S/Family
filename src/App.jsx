@@ -51,6 +51,10 @@ function App() {
     );
   }
 
+  import ErrorBoundary from './components/ErrorBoundary';
+
+  // ... (imports remain the same)
+
   return (
     <AudioProvider>
       <CustomCursor />
@@ -58,25 +62,27 @@ function App() {
       <ScrollToTop />
       <NavigationDock />
       <AnimatePresence mode="wait">
-        <Suspense fallback={
-          <div style={{
-            height: '100vh',
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#d4af37',
-            backgroundColor: '#030305'
-          }}>
-            Loading...
-          </div>
-        }>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Home />} />
-            <Route path="/member/:id" element={<MemberDetails />} />
-            <Route path="/memory/:id" element={<MemoryDetails />} />
-          </Routes>
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={
+            <div style={{
+              height: '100vh',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#d4af37',
+              backgroundColor: '#030305'
+            }}>
+              Loading...
+            </div>
+          }>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Home />} />
+              <Route path="/member/:id" element={<MemberDetails />} />
+              <Route path="/memory/:id" element={<MemoryDetails />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </AnimatePresence>
     </AudioProvider>
   );
