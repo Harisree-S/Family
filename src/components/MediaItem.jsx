@@ -8,12 +8,12 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
     const [isHovered, setIsHovered] = useState(false);
     const { playSfx } = useAudio();
 
+    console.log("Rendering MediaItem:", item.url); // Debug log
+
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, scale: 0.9 }}
             animate={{
-                opacity: 1,
                 scale: isHovered ? 1.03 : 1,
                 y: isHovered ? -5 : 0
             }}
@@ -46,9 +46,8 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
                     </>
                 ) : (
                     <img
-                        src={item.url.includes('cloudinary.com') ? item.url.replace('/upload/', '/upload/f_auto,q_auto/') : item.url}
+                        src={item.url && item.url.includes('cloudinary.com') ? item.url.replace('/upload/', '/upload/f_auto,q_auto/') : item.url}
                         alt={item.caption}
-                        loading="lazy"
                         style={{
                             ...styles.media,
                             objectPosition: item.position || '50% 20%', // Smart default: Top-Center
