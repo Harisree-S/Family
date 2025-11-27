@@ -5,6 +5,44 @@ import { X } from 'lucide-react';
 const ImageModal = ({ isOpen, mediaSrc, type, caption, onClose }) => {
     // Fallback type detection if not provided
     const isVideo = type === 'video' || (mediaSrc && (mediaSrc.endsWith('.mp4') || mediaSrc.startsWith('data:video')));
+    const videoRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
+    // Handle visibility change for video
+    React.useEffect(() => {
+        if (!isOpen || !isVideo) return;
+
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                if (videoRef.current && !videoRef.current.paused) {
+                    videoRef.current.pause();
+                    sessionStorage.setItem('was_video_playing', 'true');
+                } else {
+                    sessionStorage.setItem('was_video_playing', 'false');
+                }
+            } else {
+                const wasPlaying = sessionStorage.getItem('was_video_playing') === 'true';
+                if (wasPlaying && videoRef.current) {
+                    videoRef.current.play().catch(e => console.log("Video resume failed:", e));
+                }
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [isOpen, isVideo]);
 
     return (
         <AnimatePresence>
@@ -29,6 +67,7 @@ const ImageModal = ({ isOpen, mediaSrc, type, caption, onClose }) => {
 
                         {isVideo ? (
                             <video
+                                ref={videoRef}
                                 src={mediaSrc}
                                 controls
                                 autoPlay

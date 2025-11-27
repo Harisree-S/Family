@@ -239,8 +239,8 @@ const MemoryDetails = () => {
             }));
     };
 
-    const allPhotos = [...processMedia(memory.photos || []), ...uploadedPhotos];
-    const allVideos = [...processMedia(memory.videos || []), ...uploadedVideos];
+    const allPhotos = [...uploadedPhotos, ...processMedia(memory.photos || [])];
+    const allVideos = [...uploadedVideos, ...processMedia(memory.videos || [])];
 
     return (
         <motion.div

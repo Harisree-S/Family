@@ -249,8 +249,8 @@ const MemberDetails = () => {
             }));
     };
 
-    const allPhotos = [...processMedia(member.photos || []), ...uploadedPhotos];
-    const allVideos = [...processMedia(member.videos || []), ...uploadedVideos];
+    const allPhotos = [...uploadedPhotos, ...processMedia(member.photos || [])];
+    const allVideos = [...uploadedVideos, ...processMedia(member.videos || [])];
 
     return (
         <motion.div
