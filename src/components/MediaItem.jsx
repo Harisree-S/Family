@@ -35,7 +35,7 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
                     <>
                         <video
                             src={item.url}
-                            poster={item.thumbnail}
+                            poster={item.thumbnail || (item.url && item.url.includes('cloudinary') ? item.url.replace(/\.[^/.]+$/, ".jpg") : null)}
                             style={styles.media}
                             muted
                             playsInline
