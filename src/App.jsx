@@ -19,6 +19,8 @@ import Login from './components/Login';
 import NavigationDock from './components/NavigationDock';
 import BackgroundParticles from './components/BackgroundParticles';
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 const PASSWORD = "Shunnani@2025"; // Simple client-side password
 
 function App() {
@@ -51,9 +53,7 @@ function App() {
     );
   }
 
-  import ErrorBoundary from './components/ErrorBoundary';
 
-  // ... (imports remain the same)
 
   return (
     <AudioProvider>
