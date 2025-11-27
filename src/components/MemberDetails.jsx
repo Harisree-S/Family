@@ -391,139 +391,184 @@ const MemberDetails = () => {
                             variants={containerVariants}
                             initial="hidden"
                             whileInView="visible"
-                            marginBottom: '3rem',
-                        fontSize: '1rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        opacity: 0.8,
-                        transition: 'opacity 0.3s',
+                            viewport={{ once: true }}
+                            style={styles.grid}
+                        >
+                            {allVideos.length > 0 ? allVideos.map((item, index) => (
+                                <motion.div key={index} variants={itemVariants}>
+                                    <MediaItem
+                                        item={item}
+                                        type="video"
+                                        onClick={(item) => handleMediaClick(item, 'video')}
+                                        onEdit={handleEditClick}
+                                        onDelete={handleDelete}
+                                    />
+                                </motion.div>
+                            )) : (
+                                <p style={styles.emptyText}>No videos yet.</p>
+                            )}
+                        </motion.div>
+                    </motion.div>
+                </div>
+            </div>
+        </PageTransition>
+    );
+};
+
+const styles = {
+    page: {
+        minHeight: '100vh',
+        paddingBottom: '5rem',
+        backgroundColor: '#050505',
     },
-                        header: {
-                            display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '3rem',
-                        marginBottom: '6rem',
-                        position: 'relative',
+    backLink: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        color: '#d4af37',
+        textDecoration: 'none',
+        fontSize: '1.1rem',
+        marginBottom: '2rem',
+        marginTop: '2rem',
+        transition: 'transform 0.3s ease',
     },
-                        profileSection: {
-                            position: 'relative',
-                        zIndex: 1,
+    header: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '3rem',
+        marginBottom: '6rem',
+        position: 'relative',
     },
-                        profileImageWrapper: {
-                            width: 'clamp(200px, 40vw, 300px)',
-                        height: 'clamp(200px, 40vw, 300px)',
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        border: '1px solid rgba(212, 175, 55, 0.3)',
-                        boxShadow: '0 0 50px rgba(212, 175, 55, 0.15)',
-                        position: 'relative',
+    profileSection: {
+        position: 'relative',
+        zIndex: 1,
     },
-                        profileImage: {
-                            width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        filter: 'contrast(1.1) saturate(1.1)',
+    profileImageWrapper: {
+        width: 'clamp(200px, 40vw, 300px)',
+        height: 'clamp(200px, 40vw, 300px)',
+        borderRadius: '50%',
+        overflow: 'hidden',
+        border: '1px solid rgba(212, 175, 55, 0.3)',
+        boxShadow: '0 0 50px rgba(212, 175, 55, 0.15)',
+        position: 'relative',
     },
-                        profileGlow: {
-                            position: 'absolute',
-                        inset: 0,
-                        background: 'radial-gradient(circle at center, transparent 50%, rgba(212, 175, 55, 0.2) 100%)',
-                        pointerEvents: 'none',
+    profileImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        filter: 'contrast(1.1) saturate(1.1)',
     },
-                        editCoverBtn: {
-                            position: 'absolute',
-                        bottom: '20px',
-                        right: '20px',
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        border: '1px solid #d4af37',
-                        color: '#d4af37',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        zIndex: 10,
-                        transition: 'transform 0.2s',
+    profileGlow: {
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle at center, transparent 50%, rgba(212, 175, 55, 0.2) 100%)',
+        pointerEvents: 'none',
     },
-                        infoCard: {
-                            maxWidth: '800px',
-                        width: '100%',
-                        padding: '3rem',
-                        borderRadius: '30px',
-                        textAlign: 'center',
-                        marginTop: '-50px', // Overlap effect
-                        zIndex: 2,
+    editCoverBtn: {
+        position: 'absolute',
+        bottom: '20px',
+        right: '20px',
+        width: '40px',
+        height: '40px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        border: '1px solid #d4af37',
+        color: '#d4af37',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        zIndex: 10,
+        transition: 'transform 0.2s',
     },
-                        name: {
-                            fontSize: 'clamp(2.5rem, 6vw, 4rem)',
-                        fontFamily: "'Cormorant Garamond', serif",
-                        color: '#fff',
-                        marginBottom: '0.5rem',
-                        textShadow: '0 0 30px rgba(255,255,255,0.1)',
+    infoCard: {
+        maxWidth: '800px',
+        width: '100%',
+        padding: '3rem',
+        borderRadius: '30px',
+        textAlign: 'center',
+        marginTop: '-50px', // Overlap effect
+        zIndex: 2,
     },
-                        relation: {
-                            fontSize: '1.2rem',
-                        color: '#d4af37',
-                        fontFamily: "'Outfit', sans-serif",
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.2em',
-                        marginBottom: '2rem',
+    name: {
+        fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+        fontFamily: "'Cormorant Garamond', serif",
+        color: '#fff',
+        marginBottom: '0.5rem',
+        textShadow: '0 0 30px rgba(255,255,255,0.1)',
     },
-                        divider: {
-                            width: '60px',
-                        height: '1px',
-                        background: 'linear-gradient(90deg, transparent, #d4af37, transparent)',
-                        margin: '0 auto 2rem',
+    relation: {
+        fontSize: '1.2rem',
+        color: '#d4af37',
+        fontFamily: "'Outfit', sans-serif",
+        textTransform: 'uppercase',
+        letterSpacing: '0.2em',
+        marginBottom: '2rem',
     },
-                        bio: {
-                            fontSize: '1.2rem',
-                        lineHeight: '1.8',
-                        color: '#ccc',
-                        fontFamily: "'Outfit', sans-serif",
-                        fontWeight: 300,
-                        marginBottom: '2.5rem',
+    divider: {
+        width: '60px',
+        height: '1px',
+        background: 'linear-gradient(90deg, transparent, #d4af37, transparent)',
+        margin: '0 auto 2rem',
     },
-                        actionButtons: {
-                            display: 'flex',
-                        gap: '1.5rem',
-                        justifyContent: 'center',
-                        flexWrap: 'wrap',
+    bio: {
+        fontSize: '1.2rem',
+        lineHeight: '1.8',
+        color: '#ccc',
+        fontFamily: "'Outfit', sans-serif",
+        fontWeight: 300,
+        marginBottom: '2.5rem',
     },
-                        actionBtn: {
-                            display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.8rem',
-                        padding: '0.8rem 2rem',
-                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                        border: '1px solid rgba(212, 175, 55, 0.3)',
-                        borderRadius: '50px',
-                        color: '#d4af37',
-                        cursor: 'pointer',
-                        fontSize: '0.9rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '1rem',
+    actionButtons: {
+        display: 'flex',
+        gap: '1.5rem',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
     },
-                        titleIcon: {
-                            color: '#d4af37',
-                        display: 'flex',
+    actionBtn: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.8rem',
+        padding: '0.8rem 2rem',
+        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+        border: '1px solid rgba(212, 175, 55, 0.3)',
+        borderRadius: '50px',
+        color: '#d4af37',
+        cursor: 'pointer',
+        fontSize: '0.9rem',
+        textTransform: 'uppercase',
+        letterSpacing: '0.1em',
+        transition: 'all 0.3s ease',
     },
-                        grid: {
-                            display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                        gap: '2rem',
+    section: {
+        marginBottom: '3rem',
     },
-                        emptyText: {
-                            color: '#666',
-                        fontStyle: 'italic',
-                        textAlign: 'center',
-                        gridColumn: '1 / -1',
-                        padding: '2rem',
+    sectionTitle: {
+        fontSize: '2.5rem',
+        fontFamily: "'Cormorant Garamond', serif",
+        marginBottom: '3rem',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '1rem',
+    },
+    titleIcon: {
+        color: '#d4af37',
+        display: 'flex',
+    },
+    grid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+        gap: '2rem',
+    },
+    emptyText: {
+        color: '#666',
+        fontStyle: 'italic',
+        textAlign: 'center',
+        gridColumn: '1 / -1',
+        padding: '2rem',
     }
 };
 
-                        export default MemberDetails;
+export default MemberDetails;
