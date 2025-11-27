@@ -62,6 +62,23 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
             style={styles.container}
         >
             <div style={styles.mediaWrapper}>
+                {/* DEBUG OVERLAY */}
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    background: 'rgba(0,0,0,0.8)',
+                    color: '#0f0',
+                    fontSize: '10px',
+                    padding: '5px',
+                    zIndex: 100,
+                    wordBreak: 'break-all',
+                    pointerEvents: 'none'
+                }}>
+                    DEBUG URL: {item.url || 'NO URL'}
+                </div>
+
                 {type === 'video' ? (
                     <>
                         <video
@@ -69,11 +86,8 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
                             style={styles.media}
                             muted
                             playsInline
-                            controls={false}
+                            controls={true} // Enable controls for debugging
                         />
-                        <div style={styles.playOverlay}>
-                            <Play size={40} fill="rgba(255,255,255,0.8)" color="transparent" />
-                        </div>
                     </>
                 ) : (
                     <img
@@ -83,6 +97,9 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
                             ...styles.media,
                             objectPosition: item.position || '50% 20%',
                             transform: item.scale ? `scale(${item.scale})` : 'scale(1)',
+                            border: '2px solid red', // Debug border
+                            minHeight: '100px', // Force height
+                            backgroundColor: 'blue' // Debug background
                         }}
                     />
                 )}
