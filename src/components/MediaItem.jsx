@@ -46,8 +46,9 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
                     </>
                 ) : (
                     <img
-                        src={item.url}
+                        src={item.url.includes('cloudinary.com') ? item.url.replace('/upload/', '/upload/f_auto,q_auto/') : item.url}
                         alt={item.caption}
+                        loading="lazy"
                         style={{
                             ...styles.media,
                             objectPosition: item.position || '50% 20%', // Smart default: Top-Center
