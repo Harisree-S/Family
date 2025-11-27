@@ -116,9 +116,9 @@ const Home = () => {
 
       <Gallery />
 
-      <footer style={styles.footer}>
-        <p>&copy; {new Date().getFullYear()} Lalitham Sundharam. All rights reserved.</p>
-        <p style={styles.footerNote}>Made with love for the family.</p>
+      <footer className="py-8 text-center text-[#888] text-sm relative z-10">
+        <p>&copy; 2024 Lalitham Sundharam. All rights reserved.</p>
+        <p style={{ color: 'red', fontWeight: 'bold' }}>VERSION: DEBUG-FIX-1 (If you do not see this, REFRESH)</p>
       </footer>
     </PageTransition>
   );
