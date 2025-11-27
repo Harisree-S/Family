@@ -6,9 +6,40 @@ import { useAudio } from './AudioController';
 
 const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
     const [isHovered, setIsHovered] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [hasError, setHasError] = useState(false);
     const { playSfx } = useAudio();
 
-    console.log("Rendering MediaItem:", item.url); // Debug log
+    // Helper to safely optimize Cloudinary URLs
+    const getOptimizedUrl = (url, isVideo = false) => {
+        if (!url) return '';
+        if (!url.includes('cloudinary.com')) return url;
+        // Check if already transformed
+        if (url.includes('f_auto,q_auto')) return url;
+        // Inject transformation
+        return url.replace('/upload/', '/upload/f_auto,q_auto/');
+    };
+
+    // Helper for video poster
+    const getVideoPoster = (url) => {
+        if (!url) return null;
+        if (item.thumbnail) return item.thumbnail;
+        if (url.includes('cloudinary.com')) {
+            // Force jpg extension for poster
+            return url.replace(/\.[^/.]+$/, ".jpg").replace('/upload/', '/upload/so_0/'); // so_0 = start offset 0 (first frame)
+        }
+        return null;
+    };
+
+    const handleLoad = () => {
+        setIsLoading(false);
+    };
+
+    const handleError = (e) => {
+        console.error(`Failed to load ${type}:`, item.url);
+        setIsLoading(false);
+        setHasError(true);
+    };
 
     return (
         <motion.div
@@ -31,40 +62,56 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
             style={styles.container}
         >
             <div style={styles.mediaWrapper}>
+                {/* Loading Spinner */}
+                {isLoading && !hasError && (
+                    <div style={styles.loader}>
+                        <div className="spinner"></div>
+                    </div>
+                )}
+
+                {/* Error Fallback */}
+                {hasError && (
+                    <div style={styles.errorState}>
+                        <span style={{ fontSize: '2rem' }}>⚠️</span>
+                        <span style={{ fontSize: '0.8rem', color: '#666' }}>Failed to load</span>
+                    </div>
+                )}
+
                 {type === 'video' ? (
                     <>
                         <video
                             src={item.url}
-                            poster={item.thumbnail || (item.url && item.url.includes('cloudinary') ? item.url.replace(/\.[^/.]+$/, ".jpg") : null)}
-                            style={styles.media}
+                            poster={getVideoPoster(item.url)}
+                            style={{
+                                ...styles.media,
+                                opacity: (isLoading || hasError) ? 0 : 1
+                            }}
                             muted
                             playsInline
                             preload="metadata"
-                            onError={(e) => {
-                                console.error("Video error:", item.url);
-                                e.target.style.display = 'none'; // Hide broken video to show background
-                            }}
+                            onLoadedData={handleLoad}
+                            onError={handleError}
                         />
-                        <div style={styles.playOverlay}>
-                            <Play size={40} fill="rgba(255,255,255,0.8)" color="transparent" />
-                        </div>
+                        {!isLoading && !hasError && (
+                            <div style={styles.playOverlay}>
+                                <Play size={40} fill="rgba(255,255,255,0.8)" color="transparent" />
+                            </div>
+                        )}
                     </>
                 ) : (
                     <img
-                        src={item.url && item.url.includes('cloudinary.com') ? item.url.replace('/upload/', '/upload/f_auto,q_auto/') : item.url}
+                        src={hasError ? 'https://placehold.co/600x400/1a1a1a/333/png?text=Image+Error' : getOptimizedUrl(item.url)}
                         alt={item.caption}
                         loading="lazy"
                         style={{
                             ...styles.media,
                             objectPosition: item.position || '50% 20%',
                             transform: item.scale ? `scale(${item.scale})` : 'scale(1)',
-                            filter: 'contrast(1.05) saturate(1.1)'
+                            filter: 'contrast(1.05) saturate(1.1)',
+                            opacity: (isLoading && !hasError) ? 0 : 1
                         }}
-                        onError={(e) => {
-                            console.error("Image load error:", item.url);
-                            e.target.style.opacity = 0.5; // Dim broken image
-                            e.target.src = 'https://placehold.co/600x400/1a1a1a/d4af37/png?text=Image+Error'; // Fallback
-                        }}
+                        onLoad={handleLoad}
+                        onError={handleError}
                     />
                 )}
 
@@ -83,7 +130,7 @@ const MediaItem = ({ item, type, onClick, onEdit, onDelete }) => {
                 <motion.div
                     style={styles.captionContainer}
                     animate={{
-                        x: isHovered ? -20 : 0, // Slight shift left to make room, or keep centered if preferred
+                        x: isHovered ? -20 : 0,
                         paddingRight: isHovered ? '60px' : '0px'
                     }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -220,7 +267,45 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    loader: {
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#1a1a1a',
+        zIndex: 2,
+    },
+    errorState: {
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#1a1a1a',
+        gap: '0.5rem',
+        zIndex: 2,
     }
 };
+
+// Add global style for spinner if not present
+const styleSheet = document.createElement("style");
+styleSheet.innerText = `
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(212, 175, 55, 0.3);
+  border-top: 3px solid #d4af37;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+`;
+document.head.appendChild(styleSheet);
 
 export default MediaItem;
