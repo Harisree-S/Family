@@ -5,7 +5,7 @@ import { getCoverOverride } from '../utils/mediaStore';
 import clickAudio from '../assets/audio/click.mp3';
 import { useAudio } from './AudioController';
 
-const MemberCard = ({ member }) => {
+const MemberCard = ({ member, index }) => {
     const ref = useRef(null);
     const [isHovered, setIsHovered] = useState(false);
     const [coverOverride, setCoverOverride] = useState(null);
@@ -82,7 +82,7 @@ const MemberCard = ({ member }) => {
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+                transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.1 }}
             >
                 <div style={styles.innerCard}>
                     <div style={styles.imageContainer}>

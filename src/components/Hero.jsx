@@ -133,7 +133,11 @@ const Hero = () => {
                             fetchPriority="high"
                             loading="eager"
                         />
-                        <div style={styles.imageGlow} />
+                        <motion.div
+                            style={styles.imageGlow}
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                        />
                         <div style={styles.reflection} />
                     </motion.div>
                 </div>
@@ -256,10 +260,12 @@ function getStyles(isMobile) {
         },
         imageGlow: {
             position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to bottom, transparent 0%, rgba(3,3,5,0.4) 100%)',
-            pointerEvents: 'none',
-            borderRadius: '20px',
+            inset: -50,
+            background: 'conic-gradient(from 0deg at 50% 50%, #d4af37 0deg, transparent 60deg, transparent 300deg, #d4af37 360deg)',
+            filter: 'blur(60px)',
+            opacity: 0.15,
+            zIndex: -1,
+            borderRadius: '50%',
         },
         reflection: {
             position: 'absolute',
