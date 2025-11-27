@@ -85,6 +85,7 @@ const MemberDetails = () => {
             member.id,
             'member',
             (media) => {
+                console.log("Subscription update:", media);
                 const photos = media.filter(m => m.type === 'image');
                 const videos = media.filter(m => m.type === 'video');
                 setUploadedPhotos(photos);
@@ -502,18 +503,6 @@ const MemberDetails = () => {
                         color: '#d4af37',
                         cursor: 'pointer',
                         fontSize: '0.9rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        transition: 'all 0.3s ease',
-    },
-                        section: {
-                            marginBottom: '6rem',
-    },
-                        sectionTitle: {
-                            fontSize: '2.5rem',
-                        fontFamily: "'Cormorant Garamond', serif",
-                        marginBottom: '3rem',
-                        color: '#fff',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
