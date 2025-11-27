@@ -117,7 +117,7 @@ const Home = () => {
       <Gallery />
 
       <footer style={styles.footer}>
-        <p>&copy; {new Date().getFullYear()} Lalitham Sundaram. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Lalitham Sundharam. All rights reserved.</p>
         <p style={styles.footerNote}>Made with love for the family.</p>
       </footer>
     </PageTransition>

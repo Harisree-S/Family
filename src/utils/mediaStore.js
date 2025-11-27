@@ -33,6 +33,8 @@ export const openCloudinaryWidget = (onSuccess, onClosed) => {
         sources: ['local', 'url', 'camera'],
         showAdvancedOptions: false,
         cropping: false,
+        resourceType: "auto",
+        clientAllowedFormats: null, // Allow all formats
         multiple: false,
         defaultSource: "local",
         styles: {

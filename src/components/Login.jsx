@@ -36,7 +36,7 @@ const Login = ({ onLogin }) => {
                     <Lock size={32} color="#d4af37" />
                 </motion.div>
 
-                <h1 style={styles.title}>Lalitham Sundaram</h1>
+                <h1 style={styles.title}>Lalitham Sundharam</h1>
                 <p style={styles.subtitle}>Private Family Access</p>
 
                 <form onSubmit={handleSubmit} style={styles.form}>
