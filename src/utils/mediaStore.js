@@ -234,3 +234,16 @@ export const updateStaticCaption = (url, newCaption) => {
 export const getStaticCaptionOverrides = () => {
     return JSON.parse(localStorage.getItem(STATIC_CAPTIONS_KEY) || '{}');
 };
+
+export const deleteAllUploads = async () => {
+    try {
+        const q = query(collection(db, UPLOADS_COLLECTION));
+        const querySnapshot = await getDocs(q);
+        const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
+        await Promise.all(deletePromises);
+        console.log("All uploads deleted from Firestore");
+    } catch (error) {
+        console.error("Error deleting all uploads:", error);
+        throw error;
+    }
+};
