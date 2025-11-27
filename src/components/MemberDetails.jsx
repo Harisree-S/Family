@@ -22,7 +22,8 @@ import {
     getStaticCaptionOverrides,
     saveCoverOverride,
     getCoverOverride,
-    openCloudinaryWidget
+    openCloudinaryWidget,
+    subscribeToMedia
 } from '../utils/mediaStore';
 
 const containerVariants = {
@@ -74,39 +75,39 @@ const MemberDetails = () => {
     const yHeader = useTransform(scrollY, [0, 300], [0, 150]);
     const opacityHeader = useTransform(scrollY, [0, 300], [1, 0.5]);
 
-    const fetchMedia = () => {
-        if (member) {
-            getMedia(member.id, 'member').then(media => {
-                const photos = media.filter(m => m.type === 'image');
-                const videos = media.filter(m => m.type === 'video');
-                setUploadedPhotos(photos);
-                setUploadedVideos(videos);
-            }).catch(console.error);
-        }
+    useEffect(() => {
+        if (!member) return;
+
+        // Subscribe to member media
+        const unsubscribe = subscribeToMedia(member.id, 'member', (media) => {
+            const photos = media.filter(m => m.type === 'image');
+            const videos = media.filter(m => m.type === 'video');
+            setUploadedPhotos(photos);
+            setUploadedVideos(videos);
+        });
+
         setHiddenMedia(getHiddenStaticMedia());
         setCaptionOverrides(getStaticCaptionOverrides());
 
-        if (member) {
-            getCoverOverride(member.id, 'member').then(cover => {
-                if (cover) {
-                    setProfileImage(cover.url);
-                    setProfileStyle({
-                        objectPosition: cover.position,
-                        transform: `scale(${cover.scale})`
-                    });
-                } else {
-                    setProfileImage(member.photo);
-                    setProfileStyle({
-                        objectPosition: member.imagePosition || '50% 20%'
-                    });
-                }
-            });
-        }
-    };
+        getCoverOverride(member.id, 'member').then(cover => {
+            if (cover) {
+                setProfileImage(cover.url);
+                setProfileStyle({
+                    objectPosition: cover.position,
+                    transform: `scale(${cover.scale})`
+                });
+            } else {
+                setProfileImage(member.photo);
+                setProfileStyle({
+                    objectPosition: member.imagePosition || '50% 20%'
+                });
+            }
+        });
 
-    useEffect(() => {
-        fetchMedia();
+        return () => unsubscribe();
     }, [member]);
+
+
 
     const [uploadingType, setUploadingType] = useState(null); // 'photo' | 'video' | null
 
@@ -145,7 +146,7 @@ const MemberDetails = () => {
                         setIsCaptionModalOpen(true);
 
                         // We still fetch to ensure consistency
-                        fetchMedia();
+                        // fetchMedia(); // Removed manual fetch, using subscription
                     }
                 } catch (error) {
                     console.error('Save failed:', error);
@@ -187,222 +188,226 @@ const MemberDetails = () => {
                     if (item.id) {
                         await deleteMedia(item.id);
                     } else {
+                    } else {
                         hideStaticMedia(item.url);
-                    }
-                    fetchMedia();
-                    showToast('Item deleted successfully', 'success');
-                } catch (error) {
-                    console.error('Delete failed:', error);
-                    showToast('Failed to delete item', 'error');
-                }
-                setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        // For static media, we might need to force a re-render or update local state if not covered by subscription
+        setHiddenMedia(getHiddenStaticMedia());
+    }
+    // fetchMedia(); // Removed manual fetch
+    showToast('Item deleted successfully', 'success');
+} catch (error) {
+    console.error('Delete failed:', error);
+    showToast('Failed to delete item', 'error');
+}
+setConfirmModal(prev => ({ ...prev, isOpen: false }));
             }
         });
     };
 
-    const handleEditClick = (e, item) => {
-        setEditingItem(item);
-        setIsCaptionModalOpen(true);
-    };
+const handleEditClick = (e, item) => {
+    setEditingItem(item);
+    setIsCaptionModalOpen(true);
+};
 
-    const handleSaveCaption = async (newCaption) => {
-        if (!editingItem) return;
-        try {
-            if (editingItem.id) {
-                await updateMedia(editingItem.id, { caption: newCaption });
-            } else {
-                updateStaticCaption(editingItem.url, newCaption);
-            }
-            fetchMedia();
-            showToast('Caption updated successfully', 'success');
-        } catch (error) {
-            console.error('Update failed:', error);
-            showToast('Failed to update caption', 'error');
+const handleSaveCaption = async (newCaption) => {
+    if (!editingItem) return;
+    try {
+        if (editingItem.id) {
+            await updateMedia(editingItem.id, { caption: newCaption });
+        } else {
+            updateStaticCaption(editingItem.url, newCaption);
+            setCaptionOverrides(getStaticCaptionOverrides());
         }
-    };
-
-    if (!member) {
-        return <div style={{ color: 'white', textAlign: 'center', marginTop: '5rem' }}>Member not found</div>;
+        // fetchMedia(); // Removed manual fetch
+        showToast('Caption updated successfully', 'success');
+    } catch (error) {
+        console.error('Update failed:', error);
+        showToast('Failed to update caption', 'error');
     }
+};
 
-    const processMedia = (items) => {
-        return items
-            .filter(item => !hiddenMedia.includes(item.url))
-            .map(item => ({
-                ...item,
-                caption: captionOverrides[item.url] || item.caption
-            }));
-    };
+if (!member) {
+    return <div style={{ color: 'white', textAlign: 'center', marginTop: '5rem' }}>Member not found</div>;
+}
 
-    const allPhotos = [...processMedia(member.photos || []), ...uploadedPhotos];
-    const allVideos = [...processMedia(member.videos || []), ...uploadedVideos];
+const processMedia = (items) => {
+    return items
+        .filter(item => !hiddenMedia.includes(item.url))
+        .map(item => ({
+            ...item,
+            caption: captionOverrides[item.url] || item.caption
+        }));
+};
 
-    return (
-        <PageTransition>
-            <div style={styles.page}>
-                <ImageModal
-                    isOpen={!!selectedMedia}
-                    mediaSrc={selectedMedia?.url}
-                    type={selectedMedia?.type}
-                    caption={selectedMedia?.caption}
-                    onClose={handleCloseModal}
-                />
+const allPhotos = [...processMedia(member.photos || []), ...uploadedPhotos];
+const allVideos = [...processMedia(member.videos || []), ...uploadedVideos];
 
-                <CaptionModal
-                    isOpen={isCaptionModalOpen}
-                    onClose={() => setIsCaptionModalOpen(false)}
-                    onSave={handleSaveCaption}
-                    initialCaption={editingItem?.caption}
-                    title="Edit Caption"
-                />
+return (
+    <PageTransition>
+        <div style={styles.page}>
+            <ImageModal
+                isOpen={!!selectedMedia}
+                mediaSrc={selectedMedia?.url}
+                type={selectedMedia?.type}
+                caption={selectedMedia?.caption}
+                onClose={handleCloseModal}
+            />
 
-                <ConfirmModal
-                    isOpen={confirmModal.isOpen}
-                    title={confirmModal.title}
-                    message={confirmModal.message}
-                    onConfirm={confirmModal.onConfirm}
-                    onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
-                    isDangerous={confirmModal.isDangerous}
-                    confirmText="Delete"
-                />
+            <CaptionModal
+                isOpen={isCaptionModalOpen}
+                onClose={() => setIsCaptionModalOpen(false)}
+                onSave={handleSaveCaption}
+                initialCaption={editingItem?.caption}
+                title="Edit Caption"
+            />
 
-                <div className="container">
-                    <Link to="/" style={styles.backLink}>
-                        <ArrowLeft size={24} /> <span style={{ marginLeft: '0.5rem' }}>Back to Family</span>
-                    </Link>
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                onConfirm={confirmModal.onConfirm}
+                onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                isDangerous={confirmModal.isDangerous}
+                confirmText="Delete"
+            />
 
-                    <div style={styles.header}>
-                        {/* Immersive Profile Section */}
-                        <motion.div
-                            style={{ ...styles.profileSection, y: yHeader, opacity: opacityHeader }}
-                        >
-                            <div style={styles.profileImageWrapper}>
-                                <img
-                                    src={profileImage || member.photo}
-                                    alt={member.name}
-                                    style={{
-                                        ...styles.profileImage,
-                                        ...profileStyle
-                                    }}
-                                />
-                                <div style={styles.profileGlow} />
+            <div className="container">
+                <Link to="/" style={styles.backLink}>
+                    <ArrowLeft size={24} /> <span style={{ marginLeft: '0.5rem' }}>Back to Family</span>
+                </Link>
 
-                            </div>
-                        </motion.div>
-
-                        {/* Glass Info Card */}
-                        <motion.div
-                            initial={{ y: 50, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.8 }}
-                            style={styles.infoCard}
-                            className="glass-panel"
-                        >
-                            <h1 style={styles.name}>{member.name}</h1>
-                            <h3 style={styles.relation}>{member.relation}</h3>
-                            <div style={styles.divider} />
-                            <p style={styles.bio}>{member.bio}</p>
-
-                            <div style={styles.actionButtons}>
-                                <button
-                                    onClick={() => handleUploadClick('image')}
-                                    style={styles.actionBtn}
-                                    disabled={uploadingType !== null}
-                                >
-                                    {uploadingType === 'image' ? (
-                                        <span className="loader" style={{ width: 16, height: 16, border: '2px solid #d4af37', borderBottomColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'rotation 1s linear infinite' }}></span>
-                                    ) : (
-                                        <ImageIcon size={18} />
-                                    )}
-                                    <span style={{ marginLeft: '0.5rem' }}>ADD PHOTO</span>
-                                </button>
-                                <button
-                                    onClick={() => handleUploadClick('video')}
-                                    style={styles.actionBtn}
-                                    disabled={uploadingType !== null}
-                                >
-                                    {uploadingType === 'video' ? (
-                                        <span className="loader" style={{ width: 16, height: 16, border: '2px solid #d4af37', borderBottomColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'rotation 1s linear infinite' }}></span>
-                                    ) : (
-                                        <Play size={18} />
-                                    )}
-                                    <span style={{ marginLeft: '0.5rem' }}>ADD VIDEO</span>
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-
-                    {/* Photos Section */}
+                <div style={styles.header}>
+                    {/* Immersive Profile Section */}
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        style={styles.section}
+                        style={{ ...styles.profileSection, y: yHeader, opacity: opacityHeader }}
                     >
-                        <h2 style={styles.sectionTitle}>
-                            <span style={styles.titleIcon}><ImageIcon size={24} /></span>
-                            Captured Moments
-                        </h2>
-                        <motion.div
-                            variants={containerVariants}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                            style={styles.grid}
-                        >
-                            {allPhotos.length > 0 ? allPhotos.map((item, index) => (
-                                <motion.div key={index} variants={itemVariants}>
-                                    <MediaItem
-                                        item={item}
-                                        type="image"
-                                        onClick={(item) => handleMediaClick(item, 'image')}
-                                        onEdit={handleEditClick}
-                                        onDelete={handleDelete}
-                                    />
-                                </motion.div>
-                            )) : (
-                                <p style={styles.emptyText}>No photos yet.</p>
-                            )}
-                        </motion.div>
+                        <div style={styles.profileImageWrapper}>
+                            <img
+                                src={profileImage || member.photo}
+                                alt={member.name}
+                                style={{
+                                    ...styles.profileImage,
+                                    ...profileStyle
+                                }}
+                            />
+                            <div style={styles.profileGlow} />
+
+                        </div>
                     </motion.div>
 
-                    {/* Videos Section */}
+                    {/* Glass Info Card */}
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        style={styles.section}
+                        initial={{ y: 50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2, duration: 0.8 }}
+                        style={styles.infoCard}
+                        className="glass-panel"
                     >
-                        <h2 style={styles.sectionTitle}>
-                            <span style={styles.titleIcon}><Play size={24} /></span>
-                            Video Memories
-                        </h2>
-                        <motion.div
-                            variants={containerVariants}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                            style={styles.grid}
-                        >
-                            {allVideos.length > 0 ? allVideos.map((item, index) => (
-                                <motion.div key={index} variants={itemVariants}>
-                                    <MediaItem
-                                        item={item}
-                                        type="video"
-                                        onClick={(item) => handleMediaClick(item, 'video')}
-                                        onEdit={handleEditClick}
-                                        onDelete={handleDelete}
-                                    />
-                                </motion.div>
-                            )) : (
-                                <p style={styles.emptyText}>No videos yet.</p>
-                            )}
-                        </motion.div>
+                        <h1 style={styles.name}>{member.name}</h1>
+                        <h3 style={styles.relation}>{member.relation}</h3>
+                        <div style={styles.divider} />
+                        <p style={styles.bio}>{member.bio}</p>
+
+                        <div style={styles.actionButtons}>
+                            <button
+                                onClick={() => handleUploadClick('image')}
+                                style={styles.actionBtn}
+                                disabled={uploadingType !== null}
+                            >
+                                {uploadingType === 'image' ? (
+                                    <span className="loader" style={{ width: 16, height: 16, border: '2px solid #d4af37', borderBottomColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'rotation 1s linear infinite' }}></span>
+                                ) : (
+                                    <ImageIcon size={18} />
+                                )}
+                                <span style={{ marginLeft: '0.5rem' }}>ADD PHOTO</span>
+                            </button>
+                            <button
+                                onClick={() => handleUploadClick('video')}
+                                style={styles.actionBtn}
+                                disabled={uploadingType !== null}
+                            >
+                                {uploadingType === 'video' ? (
+                                    <span className="loader" style={{ width: 16, height: 16, border: '2px solid #d4af37', borderBottomColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'rotation 1s linear infinite' }}></span>
+                                ) : (
+                                    <Play size={18} />
+                                )}
+                                <span style={{ marginLeft: '0.5rem' }}>ADD VIDEO</span>
+                            </button>
+                        </div>
                     </motion.div>
                 </div>
+
+                {/* Photos Section */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    style={styles.section}
+                >
+                    <h2 style={styles.sectionTitle}>
+                        <span style={styles.titleIcon}><ImageIcon size={24} /></span>
+                        Captured Moments
+                    </h2>
+                    <motion.div
+                        variants={containerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        style={styles.grid}
+                    >
+                        {allPhotos.length > 0 ? allPhotos.map((item, index) => (
+                            <motion.div key={index} variants={itemVariants}>
+                                <MediaItem
+                                    item={item}
+                                    type="image"
+                                    onClick={(item) => handleMediaClick(item, 'image')}
+                                    onEdit={handleEditClick}
+                                    onDelete={handleDelete}
+                                />
+                            </motion.div>
+                        )) : (
+                            <p style={styles.emptyText}>No photos yet.</p>
+                        )}
+                    </motion.div>
+                </motion.div>
+
+                {/* Videos Section */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    style={styles.section}
+                >
+                    <h2 style={styles.sectionTitle}>
+                        <span style={styles.titleIcon}><Play size={24} /></span>
+                        Video Memories
+                    </h2>
+                    <motion.div
+                        variants={containerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        style={styles.grid}
+                    >
+                        {allVideos.length > 0 ? allVideos.map((item, index) => (
+                            <motion.div key={index} variants={itemVariants}>
+                                <MediaItem
+                                    item={item}
+                                    type="video"
+                                    onClick={(item) => handleMediaClick(item, 'video')}
+                                    onEdit={handleEditClick}
+                                    onDelete={handleDelete}
+                                />
+                            </motion.div>
+                        )) : (
+                            <p style={styles.emptyText}>No videos yet.</p>
+                        )}
+                    </motion.div>
+                </motion.div>
             </div>
-        </PageTransition>
-    );
+        </div>
+    </PageTransition>
+);
 };
 
 const styles = {

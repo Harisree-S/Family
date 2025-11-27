@@ -9,7 +9,8 @@ import {
     doc,
     updateDoc,
     setDoc,
-    getDoc
+    getDoc,
+    onSnapshot
 } from 'firebase/firestore';
 
 const UPLOADS_COLLECTION = 'uploads';
@@ -117,6 +118,24 @@ export const getMedia = async (parentId, category) => {
         console.error("Error fetching media:", error);
         return [];
     }
+};
+
+export const subscribeToMedia = (parentId, category, onUpdate) => {
+    const q = query(
+        collection(db, UPLOADS_COLLECTION),
+        where("parentId", "==", parseInt(parentId)),
+        where("category", "==", category)
+    );
+
+    return onSnapshot(q, (querySnapshot) => {
+        const media = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        onUpdate(media);
+    }, (error) => {
+        console.error("Error subscribing to media:", error);
+    });
 };
 
 export const deleteMedia = async (id) => {
