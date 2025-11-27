@@ -87,10 +87,9 @@ const MemoryDetails = () => {
                 const videos = media.filter(m => m.type === 'video');
                 setUploadedPhotos(photos);
                 setUploadedVideos(videos);
-                setDebugError(null);
             },
             (error) => {
-                setDebugError(error.message);
+                console.error("Subscription error:", error);
             }
         );
 
