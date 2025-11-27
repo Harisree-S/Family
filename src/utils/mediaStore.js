@@ -10,7 +10,7 @@ import {
     updateDoc,
     setDoc,
     getDoc,
-    onSnapshot
+    orderBy
 } from 'firebase/firestore';
 
 const UPLOADS_COLLECTION = 'uploads';
@@ -107,7 +107,8 @@ export const getMedia = async (parentId, category) => {
         const q = query(
             collection(db, UPLOADS_COLLECTION),
             where("parentId", "==", parseInt(parentId)),
-            where("category", "==", category)
+            where("category", "==", category),
+            orderBy("timestamp", "desc")
         );
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => ({
@@ -124,7 +125,8 @@ export const subscribeToMedia = (parentId, category, onUpdate, onError) => {
     const q = query(
         collection(db, UPLOADS_COLLECTION),
         where("parentId", "==", parseInt(parentId)),
-        where("category", "==", category)
+        where("category", "==", category),
+        orderBy("timestamp", "desc")
     );
 
     return onSnapshot(q, (querySnapshot) => {

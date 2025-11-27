@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
@@ -33,7 +34,7 @@ const ImageModal = ({ isOpen, mediaSrc, type, caption, onClose }) => {
         };
     }, [isOpen, isVideo]);
 
-    return (
+    return ReactDOM.createPortal(
         <AnimatePresence>
             {isOpen && (
                 <motion.div
@@ -74,7 +75,8 @@ const ImageModal = ({ isOpen, mediaSrc, type, caption, onClose }) => {
                     </motion.div>
                 </motion.div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 };
 
