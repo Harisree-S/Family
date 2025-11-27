@@ -250,6 +250,7 @@ function getStyles(isMobile) {
             borderRadius: '20px',
             boxShadow: '0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.1)',
             transformStyle: 'preserve-3d',
+            willChange: 'transform', // GPU Acceleration
         },
         mainImage: {
             width: '100%',
@@ -266,6 +267,7 @@ function getStyles(isMobile) {
             opacity: 0.15,
             zIndex: -1,
             borderRadius: '50%',
+            willChange: 'transform', // GPU Acceleration
         },
         reflection: {
             position: 'absolute',
